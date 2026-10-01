@@ -18,10 +18,10 @@ const charger = (fichier) => vm.runInContext(fs.readFileSync(path.join(racine, f
 const html = fs.readFileSync(path.join(racine, 'index.html'), 'utf8');
 const tousScripts = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]);
 // Seules les données et le moteur sont chargés ici (pas l'interface).
-const scripts = tousScripts.filter((s) => /^js\/(ingredients|categories|moteur|photos-recettes|recettes\/)/.test(s));
+const scripts = tousScripts.filter((s) => /^js\/(ingredients|categories|moteur|photos-recettes|batch|recettes\/)/.test(s));
 scripts.forEach(charger);
 
-const { INGREDIENTS, RECETTES, Moteur, CATEGORIES, PHOTOS_RECETTES } = contexte.window;
+const { INGREDIENTS, RECETTES, Moteur, CATEGORIES, PHOTOS_RECETTES, BATCH } = contexte.window;
 const erreurs = [];
 const avertissements = [];
 
@@ -82,6 +82,37 @@ if (PHOTOS_RECETTES) {
   Object.entries(PHOTOS_RECETTES).forEach(([id, sources]) => {
     if (!idsRecettes.has(id)) erreurs.push(`photos-recettes.js : recette inconnue "${id}"`);
     sources.split('|').forEach((c) => { if (!/^[wc]:\S/.test(c)) erreurs.push(`photos-recettes.js : source invalide "${c}" pour ${id}`); });
+  });
+}
+
+// ---------- Batch cooking ----------
+if (BATCH) {
+  const parId = new Map(RECETTES.map((r) => [r.id, r]));
+  Object.entries(BATCH.CONSERVATION).forEach(([id, c]) => {
+    if (!parId.has(id)) erreurs.push(`batch.js : recette inconnue "${id}"`);
+    if (!(c[0] > 0) || !(c[1] >= 0) || !BATCH.MODES[c[2]]) erreurs.push(`batch.js : conservation invalide pour ${id}`);
+    // Repères Anses / USDA : 4 jours au plus pour un plat cuisiné, 2 pour le poisson et les fruits de mer.
+    const r = parId.get(id);
+    if (r && c[2] !== 'boite' && !['sauce', 'froid', 'base', 'gateau'].includes(c[2]) && c[0] > 4) avertissements.push(`batch.js : ${id} gardé ${c[0]} jours au frais, est-ce prudent ?`);
+    if (r && ['Poissons'].includes(r.cat) && c[0] > 2) avertissements.push(`batch.js : ${id} (poisson) gardé ${c[0]} jours au frais`);
+  });
+  RECETTES.filter((r) => r.cuisine === 'Batch cooking' && !BATCH.CONSERVATION[r.id]).forEach((r) => erreurs.push(`batch.js : conservation manquante pour ${r.id}`));
+  BATCH.SPECIALES.forEach((id) => {
+    if (!parId.has(id)) erreurs.push(`batch.js : recette spéciale inconnue "${id}"`);
+    else if (!BATCH.CONSERVATION[id]) erreurs.push(`batch.js : conservation manquante pour ${id}`);
+  });
+  const idsSessions = new Set();
+  BATCH.SESSIONS.forEach((s) => {
+    if (idsSessions.has(s.id)) erreurs.push(`batch.js : session en double "${s.id}"`);
+    idsSessions.add(s.id);
+    ['nom', 'emoji', 'desc', 'duree', 'tags', 'recettes', 'plan'].forEach((c) => { if (s[c] === undefined) erreurs.push(`session ${s.id} : champ "${c}" manquant`); });
+    s.tags.forEach((t) => { if (!BATCH.TAGS[t]) erreurs.push(`session ${s.id} : thème inconnu "${t}"`); });
+    s.recettes.forEach(([id, portions, repas]) => {
+      if (!parId.has(id)) erreurs.push(`session ${s.id} : recette inconnue "${id}"`);
+      else if (!BATCH.CONSERVATION[id]) erreurs.push(`session ${s.id} : ${id} n'a pas de durée de conservation`);
+      if (!(portions > 0)) erreurs.push(`session ${s.id} : portions invalides pour ${id}`);
+      if (repas && !['petitdej', 'dejeuner', 'diner', 'collation'].includes(repas)) erreurs.push(`session ${s.id} : repas inconnu "${repas}"`);
+    });
   });
 }
 

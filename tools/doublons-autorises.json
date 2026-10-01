@@ -1,5 +1,18 @@
 [
-  ["Salade de pâtes au pesto", "Pâtes au pesto"],
-  ["Chili con carne", "Chili sin carne"],
-  ["Steak frites au four", "Frites au four"]
+  [
+    "Salade de pâtes au pesto",
+    "Pâtes au pesto"
+  ],
+  [
+    "Chili con carne",
+    "Chili sin carne"
+  ],
+  [
+    "Steak frites au four",
+    "Frites au four"
+  ],
+  [
+    "Mousse au chocolat",
+    "Mousse au chocolat protéinée"
+  ]
 ]

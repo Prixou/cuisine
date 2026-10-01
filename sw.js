@@ -3,7 +3,7 @@
  * mise à jour en arrière-plan pour la visite suivante. */
 'use strict';
 
-var CACHE = 'ma-cuisine-v3';
+var CACHE = 'ma-cuisine-v4';
 var CACHE_PHOTOS = 'ma-cuisine-photos';
 var PHOTOS_MAX = 700;
 var FICHIERS = [
@@ -31,6 +31,9 @@ var FICHIERS = [
   'js/recettes/monde-tartes-sandwichs-accomp-sauces.js',
   'js/recettes/monde-petitdej-desserts.js',
   'js/photos-recettes.js',
+  'js/recettes/healthy-tendances.js',
+  'js/recettes/batch-cooking.js',
+  'js/batch.js',
   'js/donnees.js',
   'js/photos-auto.js',
   'js/minuteurs.js',
@@ -42,6 +45,7 @@ var FICHIERS = [
   'js/vues/frigo.js',
   'js/vues/profil.js',
   'js/vues/editeur.js',
+  'js/vues/batch.js',
   'js/app.js'
 ];
 

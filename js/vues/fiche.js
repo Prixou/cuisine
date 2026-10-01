@@ -13,6 +13,25 @@
     return '<div class="tuile ' + classe + '"><span class="tuile-valeur">' + valeur + '<small> g</small></span><span class="tuile-nom">' + nom + '</span></div>';
   }
 
+  /* Batch cooking : durée de conservation, réchauffage et sessions qui contiennent la recette. */
+  function blocConservation(r) {
+    var B = window.BATCH, c = B.conservation(r.id);
+    if (!c) return '';
+    var sessions = B.sessionsAvec(r.id);
+    return '<section class="bloc conservation">' +
+      '<h2>🍱 Batch cooking</h2>' +
+      '<ul class="conserv-liste">' +
+        '<li><span aria-hidden="true">' + (c.mode === 'boite' ? '🫙' : '🧊') + '</span><div><b>' + c.frigo + ' jours</b><small>' + (c.mode === 'boite' ? 'en boîte hermétique' : 'au réfrigérateur') + '</small></div></li>' +
+        '<li><span aria-hidden="true">❄️</span><div><b>' + (c.congel ? c.congel + ' mois' : 'Déconseillé') + '</b><small>au congélateur</small></div></li>' +
+      '</ul>' +
+      '<p><b>' + (c.mode === 'froid' || c.mode === 'boite' ? 'Pour servir' : c.mode === 'base' ? 'Pour l\'utiliser' : 'Pour réchauffer') + ' :</b> ' + U.esc(c.reprise) + '</p>' +
+      (c.conseil ? '<p>💡 ' + U.esc(c.conseil) + '</p>' : '') +
+      (sessions.length ? '<p class="conserv-sessions">Dans ' + (sessions.length > 1 ? 'les sessions' : 'la session') + ' ' + sessions.map(function (x) {
+        return '<a href="#/batch/' + encodeURIComponent(x.id) + '">' + U.esc(x.emoji + ' ' + x.nom) + '</a>';
+      }).join(', ') + '</p>' : '') +
+    '</section>';
+  }
+
   window.Vues.recette = function (app, params) {
     var id = params[0];
     var r = D.parId[id];
@@ -80,6 +99,7 @@
               '<h2>Ingrédients <small data-ing-pour></small></h2>' +
               '<ul class="ingredients" data-ingredients></ul>' +
             '</section>' +
+            blocConservation(r) +
           '</div>' +
 
           '<div class="fiche-droite">' +

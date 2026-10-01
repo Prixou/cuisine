@@ -1,6 +1,6 @@
 # 🍳 Ma Cuisine
 
-Application web de cuisine : **500 recettes** du monde entier, quantités ajustables au nombre de portions, **calories et macros** pour chaque plat, planning des repas, liste de courses, mode frigo, objectifs nutritionnels et recettes personnelles. Elle s'installe sur le téléphone et fonctionne hors ligne.
+Application web de cuisine : **569 recettes** du monde entier, dont des recettes healthy tendance et un grand volet **batch cooking**. Les quantités s'ajustent au nombre de portions, et chaque plat affiche ses **calories et macros**. L'application propose aussi un planning des repas, une liste de courses, un mode frigo, des objectifs nutritionnels et vos recettes personnelles. Elle s'installe sur le téléphone et fonctionne hors ligne.
 
 ## Utilisation
 
@@ -11,7 +11,8 @@ Application web de cuisine : **500 recettes** du monde entier, quantités ajusta
 
 | | |
 |---|---|
-| 📖 **Recettes** | 500 recettes, 14 catégories, plus de 60 cuisines. Recherche par nom ou ingrédient. Filtres par cuisine, temps, régime (végétarien, vegan, sans gluten), riche en protéines, léger. Tri par calories, protéines, temps, mes notes ou « adapté à mes objectifs ». |
+| 📖 **Recettes** | 569 recettes, 14 catégories, plus de 60 cuisines, dont 36 recettes healthy tendance (cottage cheese, protéines, fibres, chou…). Recherche par nom ou ingrédient. Filtres par cuisine, temps, régime (végétarien, vegan, sans gluten), riche en protéines, léger. Tri par calories, protéines, temps, mes notes ou « adapté à mes objectifs ». |
+| 🍱 **Batch cooking** | 8 sessions clés en main (healthy, gourmande en famille, végétarienne, protéinée, petit budget, congélateur plein, express 1 h, mijotés d'hiver). Chaque session donne l'ordre des étapes avec minuteurs, la quantité ajustable (½ à 2×), tout l'ajout aux courses en un geste et la **répartition automatique dans le planning** : ce qui se garde le moins est mangé en premier, ce qui ne se congèle pas avant sa date limite. 33 recettes pensées pour cuisiner en quantité, durée de conservation (frigo / congélateur) et façon de réchauffer pour plus de 210 recettes, filtre « 🍱 Batch cooking » dans la liste. |
 | ⚖️ **Portions** | Toutes les quantités sont recalculées et arrondies intelligemment (½, ¼, kg, L, cuillères, gousses, tranches…). |
 | 🔥 **Macros** | kcal, protéines, glucides, lipides, fibres par portion et au total, répartition des calories, part de vos besoins du jour. |
 | 🛒 **Liste de courses** | Ajout d'une recette (ou de toute la semaine du planning) avec ses portions. Les ingrédients sont additionnés et rangés par rayon. Articles libres, cases à cocher, partage / copie. |
@@ -27,7 +28,7 @@ Application web de cuisine : **500 recettes** du monde entier, quantités ajusta
 
 ## Calcul des macros
 
-Chaque ingrédient a ses valeurs pour 100 g dans `js/ingredients.js` (≈ 310 ingrédients, d'après les tables **CIQUAL** (Anses) et **USDA**, arrondies).
+Chaque ingrédient a ses valeurs pour 100 g dans `js/ingredients.js` (≈ 320 ingrédients, d'après les tables **CIQUAL** (Anses) et **USDA**, arrondies).
 Les recettes indiquent leurs ingrédients en g, ml, pièces ou cuillères. Le moteur (`js/moteur.js`) convertit tout en grammes (poids moyen d'une pièce, densité) puis additionne.
 Les valeurs sont **indicatives** : elles portent sur les ingrédients crus, sans les ingrédients « selon goût », et l'huile de friture est comptée pour la seule part absorbée.
 
@@ -42,12 +43,13 @@ js/outils.js                stockage, texte, dates, fenêtres, images
 js/ingredients.js           base nutritionnelle
 js/categories.js            catégories
 js/moteur.js                conversions, calculs nutritionnels, arrondis
-js/recettes/*.js            les 500 recettes
+js/recettes/*.js            les 569 recettes
 js/photos-recettes.js       où chercher la photo de chaque recette (Wikipédia, Commons)
+js/batch.js                 batch cooking : conservation, réchauffage, sessions
 js/donnees.js               données perso, objectifs, planning, courses, photos
 js/photos-auto.js           recherche des photos sur Wikimedia, cache, crédits
 js/minuteurs.js             minuteurs de cuisine
-js/vues/*.js                écrans (liste, fiche, courses, planning, frigo, objectifs, éditeur)
+js/vues/*.js                écrans (liste, fiche, batch, courses, planning, frigo, objectifs, éditeur)
 js/app.js                   navigation
 tools/valider.js            vérification des données (dont les doublons)
 tools/ajouter-fichier.py    déclare un nouveau fichier de recettes
@@ -75,6 +77,8 @@ Ajoutez un objet dans un fichier de `js/recettes/` (ou créez un fichier, puis l
 ```
 
 Ajoutez aussi la source de sa photo dans `js/photos-recettes.js` : `'mon-plat': 'w:Titre de l\'article Wikipédia|c:recherche en anglais'`. Les candidats sont essayés dans l'ordre : `w:` prend l'image principale de l'article Wikipédia en français, `c:` cherche des photos sur Wikimedia Commons.
+
+Si le plat se prête au batch cooking, indiquez sa conservation dans `js/batch.js` : `'mon-plat': [4, 3, 'mijote']` (jours au réfrigérateur, mois au congélateur ou 0, façon de réchauffer). Les durées suivent les repères de l'Anses et de l'USDA : 3 à 4 jours pour un plat cuisiné, 2 pour le poisson.
 
 Unités : `g`, `kg`, `ml`, `cl`, `l`, `pc` (pièce), `cs` (c. à soupe), `cc` (c. à café), `pincee`, `qs` (selon goût).
 

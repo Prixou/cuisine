@@ -14,6 +14,9 @@
     if (r.nutrition.regimes.vegan) b.push('<span class="badge badge-vege">Vegan</span>');
     else if (r.nutrition.regimes.vegetarien) b.push('<span class="badge badge-vege">Végé</span>');
     if (r.proteine) b.push('<span class="badge badge-proteine">Protéiné</span>');
+    var c = window.BATCH.conservation(r.id);
+    if (c && c.congel) b.push('<span class="badge badge-batch" title="Se congèle ' + c.congel + ' mois">❄️ Batch</span>');
+    else if (c) b.push('<span class="badge badge-batch" title="Se garde ' + c.frigo + ' jours">Batch</span>');
     return b.join('');
   };
 
