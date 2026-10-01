@@ -16,7 +16,9 @@ vm.createContext(contexte);
 const charger = (fichier) => vm.runInContext(fs.readFileSync(path.join(racine, fichier), 'utf8'), contexte, { filename: fichier });
 
 const html = fs.readFileSync(path.join(racine, 'index.html'), 'utf8');
-const scripts = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]).filter((s) => s !== 'js/app.js');
+const tousScripts = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]);
+// Seules les données et le moteur sont chargés ici (pas l'interface).
+const scripts = tousScripts.filter((s) => /^js\/(ingredients|categories|moteur|recettes\/)/.test(s));
 scripts.forEach(charger);
 
 const { INGREDIENTS, RECETTES, Moteur, CATEGORIES } = contexte.window;
@@ -26,6 +28,13 @@ const avertissements = [];
 // Les fichiers de recettes présents sur le disque doivent tous être chargés par index.html
 fs.readdirSync(path.join(racine, 'js/recettes')).forEach((f) => {
   if (!scripts.includes('js/recettes/' + f)) erreurs.push(`js/recettes/${f} n'est pas chargé dans index.html`);
+});
+
+// Le service worker doit mettre en cache tous les fichiers de l'application
+const sw = fs.readFileSync(path.join(racine, 'sw.js'), 'utf8');
+const feuilles = [...html.matchAll(/<link rel="stylesheet" href="([^"]+)"/g)].map((m) => m[1]);
+tousScripts.concat(feuilles).forEach((f) => {
+  if (!sw.includes("'" + f + "'")) erreurs.push(`${f} absent de la liste de cache de sw.js`);
 });
 
 Object.entries(INGREDIENTS).forEach(([id, e]) => {

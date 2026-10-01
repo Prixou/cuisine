@@ -3,25 +3,30 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="Des centaines de recettes avec quantités ajustables, calories et macros par portion.">
-  <meta name="theme-color" content="#c2410c">
+  <meta name="description" content="Des centaines de recettes avec quantités ajustables, calories et macros, planning, liste de courses et mode frigo.">
+  <meta name="theme-color" content="#b9441a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Ma Cuisine">
   <title>Ma Cuisine</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icones/icone.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icones/icone-180.png">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <header class="entete">
     <div class="entete-ligne">
       <a href="#/" class="logo" aria-label="Accueil"><span aria-hidden="true">🍳</span> Ma Cuisine</a>
-      <button class="bouton-favoris" id="btn-favoris" type="button" aria-pressed="false" title="Afficher mes favoris">♡ <span>Favoris</span></button>
-    </div>
-    <div class="recherche">
-      <input id="recherche" type="search" placeholder="Rechercher un plat, un ingrédient…" autocomplete="off" aria-label="Rechercher">
+      <nav class="nav-haut" data-nav aria-label="Navigation principale"></nav>
     </div>
   </header>
 
   <main id="app"></main>
 
+  <div id="minuteurs" class="minuteurs" hidden aria-live="polite"></div>
+  <nav class="nav-bas" data-nav aria-label="Navigation principale"></nav>
+
+  <script src="js/outils.js"></script>
   <script src="js/ingredients.js"></script>
   <script src="js/categories.js"></script>
   <script src="js/moteur.js"></script>
@@ -29,6 +34,16 @@
   <script src="js/recettes/viandes-volailles.js"></script>
   <script src="js/recettes/poissons-vege-pates.js"></script>
   <script src="js/recettes/tartes-accomp-sucre.js"></script>
+  <script src="js/donnees.js"></script>
+  <script src="js/minuteurs.js"></script>
+  <script src="js/vues/commun.js"></script>
+  <script src="js/vues/liste.js"></script>
+  <script src="js/vues/fiche.js"></script>
+  <script src="js/vues/courses.js"></script>
+  <script src="js/vues/planning.js"></script>
+  <script src="js/vues/frigo.js"></script>
+  <script src="js/vues/profil.js"></script>
+  <script src="js/vues/editeur.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
