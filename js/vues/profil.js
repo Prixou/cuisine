@@ -96,6 +96,11 @@
                 ? '<p>Sur iPhone / iPad : touchez le bouton <b>Partager</b> de Safari puis <b>« Sur l\'écran d\'accueil »</b>.</p>'
                 : '<p>Depuis le menu de votre navigateur, choisissez <b>« Installer l\'application »</b> ou <b>« Ajouter à l\'écran d\'accueil »</b>. Une fois installée, elle fonctionne hors ligne.</p>') +
         '</section>' +
+        '<section class="bloc"><h2>🔄 Version</h2>' +
+          '<p>Ma Cuisine <b>version ' + window.App.VERSION + '</b> · prix indicatifs de ' + U.esc(window.PRIX.date) + '.</p>' +
+          '<p class="aide">L\'application se met à jour toute seule quand elle est ouverte avec une connexion. Si une nouveauté n\'apparaît pas, touchez ce bouton, ou fermez complètement l\'application puis rouvrez-la.</p>' +
+          '<div class="actions-bas"><button class="bouton" data-maj>🔄 Rechercher une mise à jour</button></div>' +
+        '</section>' +
         '<section class="bloc"><h2>📷 Photos des recettes</h2>' +
           '<label class="case"><input type="checkbox" data-photos-auto' + (window.PhotosAuto.actif() ? ' checked' : '') + '> Afficher automatiquement une photo de chaque plat</label>' +
           '<p class="aide">Les photos sont des images libres de droits de <a href="https://commons.wikimedia.org" target="_blank" rel="noopener">Wikimedia Commons</a> (la photothèque de Wikipédia), ' +
@@ -154,6 +159,7 @@
         U.toast(e.target.checked ? 'Photos activées' : 'Photos désactivées : les emojis sont affichés');
         setTimeout(function () { location.reload(); }, 700);
       });
+      app.querySelector('[data-maj]').addEventListener('click', function () { window.App.verifierMiseAJour(); });
       app.querySelector('[data-photos-vider]').addEventListener('click', function () {
         window.PhotosAuto.vider();
         U.toast('Les photos seront recherchées à nouveau');

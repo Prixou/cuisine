@@ -43,8 +43,13 @@
     // ---------- Prix ----------
     var Bu = window.Budget;
 
-    function blocBudget(articles, coches) {
-      if (!articles.length) return '';
+    function blocBudget(articles, coches, chezMoi) {
+      if (!articles.length) {
+        return '<section class="bloc budget"><h2>💶 Prix estimé</h2><p class="aide">' +
+          (chezMoi ? 'Tout ce qu\'il faut est déjà chez vous : rien à acheter pour ces recettes.'
+            : 'Le prix chez Lidl et chez E.Leclerc s\'affichera ici dès que la liste contiendra des recettes. Ouvrez une recette et touchez <b>🛒 Ajouter aux courses</b>, ou ajoutez la semaine depuis le planning.') +
+          (D.courses.libres.length ? ' Les articles libres (ajoutés à la main) n\'ont pas de prix.' : '') + '</p></section>';
+      }
       var t = Bu.totaux(articles), m = Bu.magasin();
       var moinsCher = t.lidl.caisse <= t.leclerc.caisse ? 'lidl' : 'leclerc';
       var ecart = Math.abs(t.lidl.caisse - t.leclerc.caisse);
@@ -132,7 +137,7 @@
       app.innerHTML =
         '<div class="page-entete"><h1>🛒 Liste de courses</h1>' +
           (total ? '<p>' + faits + ' / ' + total + ' articles cochés</p>' : '') + '</div>' +
-        blocBudget(tousArticles, cochesIngredients) +
+        blocBudget(tousArticles, cochesIngredients, tri.chezMoi.length) +
         (recettes.length || D.courses.libres.length ? '' :
           '<div class="vide"><p>Votre liste est vide.</p><p>Ouvrez une recette et touchez <b>🛒 Ajouter aux courses</b>, ou ajoutez toute une semaine depuis le <a href="#/planning">planning</a>.</p></div>') +
         (recettes.length ? '<section class="bloc"><h2>Recettes (' + recettes.length + ')</h2><ul class="courses-recettes">' +

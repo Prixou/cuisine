@@ -30,6 +30,13 @@ fs.readdirSync(path.join(racine, 'js/recettes')).forEach((f) => {
   if (!scripts.includes('js/recettes/' + f)) erreurs.push(`js/recettes/${f} n'est pas chargé dans index.html`);
 });
 
+// La version affichée dans l'application doit suivre le nom du cache du service worker
+{
+  const v = (fs.readFileSync(path.join(racine, 'js/app.js'), 'utf8').match(/VERSION: (\d+)/) || [])[1];
+  const c = (fs.readFileSync(path.join(racine, 'sw.js'), 'utf8').match(/var CACHE = 'ma-cuisine-v(\d+)'/) || [])[1];
+  if (!v || v !== c) erreurs.push(`Version incohérente : App.VERSION = ${v}, cache du service worker v${c}`);
+}
+
 // Le service worker doit mettre en cache tous les fichiers de l'application
 const sw = fs.readFileSync(path.join(racine, 'sw.js'), 'utf8');
 const feuilles = [...html.matchAll(/<link rel="stylesheet" href="([^"]+)"/g)].map((m) => m[1]);
