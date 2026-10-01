@@ -3,7 +3,7 @@
  * mise à jour en arrière-plan pour la visite suivante. */
 'use strict';
 
-var CACHE = 'ma-cuisine-v6';
+var CACHE = 'ma-cuisine-v7';   // à changer avec App.VERSION (js/app.js) à chaque mise à jour
 var CACHE_PHOTOS = 'ma-cuisine-photos';
 var PHOTOS_MAX = 700;
 var FICHIERS = [
@@ -53,7 +53,11 @@ var FICHIERS = [
 ];
 
 self.addEventListener('install', function (e) {
-  e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(FICHIERS); }).then(function () { return self.skipWaiting(); }));
+  // cache: 'reload' : on ignore le cache HTTP (GitHub Pages le garde 10 min), sinon la nouvelle version
+  // pourrait enregistrer d'anciens fichiers.
+  e.waitUntil(caches.open(CACHE).then(function (c) {
+    return c.addAll(FICHIERS.map(function (f) { return new Request(f, { cache: 'reload' }); }));
+  }).then(function () { return self.skipWaiting(); }));
 });
 
 self.addEventListener('activate', function (e) {
