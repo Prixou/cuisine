@@ -1,6 +1,6 @@
 # 🍳 Ma Cuisine
 
-Application web de cuisine : **569 recettes** du monde entier, dont des recettes healthy tendance et un grand volet **batch cooking**. Les quantités s'ajustent au nombre de portions, et chaque plat affiche ses **calories et macros**. L'application propose aussi un planning des repas, une liste de courses, un mode frigo, des objectifs nutritionnels et vos recettes personnelles. Elle s'installe sur le téléphone et fonctionne hors ligne.
+Application web de cuisine : **569 recettes** du monde entier, dont des recettes healthy tendance et un grand volet **batch cooking**. Les quantités s'ajustent au nombre de portions, et chaque plat affiche ses **calories et macros**. L'application propose aussi un planning des repas, une liste de courses, un stock « chez moi » qui propose ce que l'on peut cuisiner sans rien acheter, des objectifs nutritionnels et vos recettes personnelles. Elle s'installe sur le téléphone et fonctionne hors ligne.
 
 ## Utilisation
 
@@ -18,7 +18,7 @@ Application web de cuisine : **569 recettes** du monde entier, dont des recettes
 | 🛒 **Liste de courses** | Ajout d'une recette (ou de toute la semaine du planning) avec ses portions. Les ingrédients sont additionnés et rangés par rayon. Articles libres, cases à cocher, partage / copie. |
 | 📅 **Planning** | Repas de la semaine (petit-déjeuner, déjeuner, dîner, collation), totaux journaliers face aux objectifs, **génération automatique** des repas selon vos calories et macros. |
 | 🎯 **Objectifs** | Calcul des besoins (formule de Mifflin-St Jeor, niveau d'activité, perte / maintien / prise de muscle) ou saisie manuelle, régime préféré, suggestions de plats et de petits-déjeuners adaptés. |
-| 🧊 **Mode frigo** | Indiquez vos ingrédients : les recettes réalisables apparaissent d'abord, avec les ingrédients manquants. Les ingrédients équivalents sont pris en compte (les différents riz, les crèmes, etc.). |
+| 🏠 **Chez moi** | Listez tout ce que vous avez à la maison, rangé par endroit (frigo, fruits et légumes, placard, condiments, épices), avec des kits pour le remplir en un geste. Les quantités sont facultatives. L'application montre les recettes **faisables sans rien acheter**, celles qui utilisent le plus vos produits frais d'abord (anti-gaspi), puis celles où il manque 1 ou 2 ingrédients. Filtres par type et par temps. Le nombre de personnes est vérifié si vous avez donné les quantités. Les ingrédients équivalents comptent (les riz, les crèmes, etc.). Sur chaque recette : 🏠 devant ce que vous avez, « ajouter seulement ce qui manque aux courses » et « je l'ai cuisinée », qui met le stock à jour. Dans la liste de courses, ce que vous avez déjà est mis de côté, et les articles achetés se rangent dans le stock en une touche. |
 | ✏️ **Mes recettes** | Créez vos recettes avec calcul automatique des macros, ajoutez vos propres ingrédients (valeurs de l'étiquette), ou « adaptez à votre façon » une recette existante. |
 | ⏱ **Minuteurs** | Les durées des étapes (« 10 min », « 1 h 30 ») deviennent des boutons. Plusieurs minuteurs en parallèle, alarme sonore, vibration et notification. |
 | 🖼️ **Photos des plats** | Chaque recette affiche une vraie photo libre de droits de Wikimedia Commons, avec son auteur et sa licence. Elle est cherchée à l'affichage, puis gardée pour le hors-ligne. « Pas la bonne photo ? » passe à la suivante. Désactivable dans Objectifs. |
@@ -45,11 +45,12 @@ js/categories.js            catégories
 js/moteur.js                conversions, calculs nutritionnels, arrondis
 js/recettes/*.js            les 569 recettes
 js/photos-recettes.js       où chercher la photo de chaque recette (Wikipédia, Commons)
+js/stock.js                 mon stock : ingrédients chez moi, quantités, recettes faisables
 js/batch.js                 batch cooking : conservation, réchauffage, sessions
 js/donnees.js               données perso, objectifs, planning, courses, photos
 js/photos-auto.js           recherche des photos sur Wikimedia, cache, crédits
 js/minuteurs.js             minuteurs de cuisine
-js/vues/*.js                écrans (liste, fiche, batch, courses, planning, frigo, objectifs, éditeur)
+js/vues/*.js                écrans (liste, fiche, batch, courses, planning, chez moi, objectifs, éditeur)
 js/app.js                   navigation
 tools/valider.js            vérification des données (dont les doublons)
 tools/ajouter-fichier.py    déclare un nouveau fichier de recettes

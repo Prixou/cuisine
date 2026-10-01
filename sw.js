@@ -3,7 +3,7 @@
  * mise à jour en arrière-plan pour la visite suivante. */
 'use strict';
 
-var CACHE = 'ma-cuisine-v4';
+var CACHE = 'ma-cuisine-v5';
 var CACHE_PHOTOS = 'ma-cuisine-photos';
 var PHOTOS_MAX = 700;
 var FICHIERS = [
@@ -35,6 +35,7 @@ var FICHIERS = [
   'js/recettes/batch-cooking.js',
   'js/batch.js',
   'js/donnees.js',
+  'js/stock.js',
   'js/photos-auto.js',
   'js/minuteurs.js',
   'js/vues/commun.js',

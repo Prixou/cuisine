@@ -21,11 +21,34 @@
   window.Vues.courses = function (app) {
     document.title = 'Liste de courses · Ma Cuisine';
 
+    /* Sépare ce qu'il faut acheter de ce qui est déjà dans mon stock (en quantité suffisante si elle est suivie). */
+    function trier(groupes) {
+      var S = window.Stock, masquer = D.courses.masquerStock !== false && S.nombre() > 0;
+      var aAcheter = [], chezMoi = [];
+      groupes.forEach(function (g) {
+        var garder = [];
+        g.articles.forEach(function (a) {
+          var src = masquer && S.source(a.cle);
+          if (!src) { garder.push(a); return; }
+          var i = window.Moteur.infos(a.cle), stock = S.grammes(src), p = a.parts;
+          var besoin = p.g + p.ml * (i.d || 1) + p.pc * (i.pc || 0) + p.cc * 5 * (i.d || 1);
+          if (stock !== null && besoin > 0 && stock < besoin) { a.note = 'vous en avez ' + S.texteQuantite(src); garder.push(a); }
+          else chezMoi.push(a);
+        });
+        if (garder.length) aAcheter.push({ nom: g.nom, emoji: g.emoji, articles: garder });
+      });
+      return { groupes: aAcheter, chezMoi: chezMoi };
+    }
+
     function rendre() {
-      var groupes = D.listeCourses();
+      var tri = trier(D.listeCourses());
+      var groupes = tri.groupes;
       var recettes = D.courses.recettes.filter(function (e) { return D.parId[e.id]; });
       var total = groupes.reduce(function (s, g) { return s + g.articles.length; }, 0) + D.courses.libres.length;
-      var faits = Object.keys(D.courses.coches).filter(function (k) { return D.courses.coches[k]; }).length;
+      var cochesIngredients = [];
+      groupes.forEach(function (g) { g.articles.forEach(function (a) { if (D.courses.coches[a.cle]) cochesIngredients.push(a); }); });
+      var faitsIngredients = cochesIngredients.length;
+      var faits = faitsIngredients + D.courses.libres.filter(function (l) { return D.courses.coches['libre-' + l.id]; }).length;
 
       app.innerHTML =
         '<div class="page-entete"><h1>🛒 Liste de courses</h1>' +
@@ -45,10 +68,16 @@
             tries.map(function (a) {
               var coche = D.courses.coches[a.cle];
               return '<li class="' + (coche ? 'coche' : '') + '"><label><input type="checkbox" data-cle="' + U.esc(a.cle) + '"' + (coche ? ' checked' : '') + '>' +
-                '<span class="article-nom">' + U.esc(a.nom) + '<small>' + U.esc(a.recettes.join(', ')) + '</small></span>' +
+                '<span class="article-nom">' + U.esc(a.nom) + '<small>' + U.esc(a.recettes.join(', ')) + '</small>' +
+                (a.note ? '<small class="article-stock">🏠 ' + U.esc(a.note) + '</small>' : '') + '</span>' +
                 '<span class="article-qte">' + U.esc(a.qte) + '</span></label></li>';
             }).join('') + '</ul></section>';
         }).join('') +
+        (tri.chezMoi.length ? '<details class="bloc chez-moi"><summary><b>🏠 Déjà chez moi</b> <small>' + U.pluriel(tri.chezMoi.length, 'article') + ' retiré' + (tri.chezMoi.length > 1 ? 's' : '') + ' de la liste</small></summary><ul class="articles">' +
+          tri.chezMoi.map(function (a) {
+            return '<li><span class="article-nom">' + U.esc(a.nom) + '<small>' + U.esc(a.recettes.join(', ')) + '</small></span><span class="article-qte">' + U.esc(a.qte) + '</span></li>';
+          }).join('') + '</ul></details>' : '') +
+        (window.Stock.nombre() ? '<label class="case"><input type="checkbox" data-masquer-stock' + (D.courses.masquerStock !== false ? ' checked' : '') + '> Ne pas afficher ce que j\'ai déjà dans <a href="#/frigo/stock">mon stock</a></label>' : '') +
         '<section class="bloc"><h2>📝 Autres articles</h2>' +
           '<form class="ajout-libre" data-form><input class="champ" data-libre placeholder="Ex. : éponges, café, pain…" aria-label="Article à ajouter"><button class="bouton">Ajouter</button></form>' +
           (D.courses.libres.length ? '<ul class="articles">' + D.courses.libres.map(function (l) {
@@ -59,6 +88,7 @@
         '</section>' +
         (total ? '<div class="actions-bas">' +
           '<button class="bouton" data-partager>📤 Partager / copier</button>' +
+          (faitsIngredients ? '<button class="bouton" data-ranger title="Ajoute à mon stock les ingrédients cochés">🏠 Ranger dans mon stock (' + faitsIngredients + ')</button>' : '') +
           '<button class="bouton" data-decocher>↺ Tout décocher</button>' +
           '<button class="bouton bouton-danger-doux" data-vider>🗑 Vider la liste</button></div>' : '');
 
@@ -114,6 +144,15 @@
           navigator.clipboard.writeText(texte).then(function () { U.toast('Liste copiée dans le presse-papiers'); },
             function () { U.toast('Copie impossible'); });
         }
+      });
+      var masquer = app.querySelector('[data-masquer-stock]');
+      if (masquer) masquer.addEventListener('change', function () { D.courses.masquerStock = masquer.checked; D.sauver('courses'); rendre(); });
+      var ranger = app.querySelector('[data-ranger]');
+      if (ranger) ranger.addEventListener('click', function () {
+        var nouveaux = 0;
+        cochesIngredients.forEach(function (a) { if (window.Stock.ranger(a.cle, a.parts)) nouveaux++; });
+        U.toast(U.pluriel(cochesIngredients.length, 'article rangé', 'articles rangés') + ' dans votre stock' + (nouveaux ? ' (' + nouveaux + ' nouveaux)' : ''));
+        rendre();
       });
       var decocher = app.querySelector('[data-decocher]');
       if (decocher) decocher.addEventListener('click', function () { D.courses.coches = {}; D.sauver('courses'); rendre(); });

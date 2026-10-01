@@ -74,6 +74,7 @@
         '<div class="actions-principales">' +
           '<button class="bouton" data-planifier>📅 Planifier</button>' +
           '<button class="bouton" data-courses>🛒 Ajouter aux courses</button>' +
+          '<button class="bouton" data-cuisinee hidden title="Retirer de mon stock ce que j\'ai utilisé">✅ Je l\'ai cuisinée</button>' +
           (r.perso
             ? '<a class="bouton" href="#/modifier/' + encodeURIComponent(id) + '">✏️ Modifier</a><button class="bouton bouton-danger-doux" data-supprimer>🗑 Supprimer</button>'
             : '<a class="bouton" href="#/dupliquer/' + encodeURIComponent(id) + '" title="Créer votre propre version modifiable">✏️ Adapter à ma façon</a>') +
@@ -97,6 +98,7 @@
             '</section>' +
             '<section class="bloc">' +
               '<h2>Ingrédients <small data-ing-pour></small></h2>' +
+              '<div class="stock-resume" data-stock-resume hidden></div>' +
               '<ul class="ingredients" data-ingredients></ul>' +
             '</section>' +
             blocConservation(r) +
@@ -177,12 +179,20 @@
       D.sauver('portions');
 
       $('[data-ing-pour]').textContent = 'pour ' + U.pluriel(portions, 'portion');
+      var S = window.Stock, avecStock = S.nombre() > 0;
       $('[data-ingredients]').innerHTML = r.ing.map(function (ligne, i) {
         var a = M.afficherLigne(ligne, facteur);
+        var marque = '';
+        if (avecStock && (ligne[2] || 'g') !== 'qs' && ligne[0] !== 'eau') {
+          var src = S.source(ligne[0]), g = src && S.grammes(src);
+          if (src && g !== null && g < M.versGrammes(ligne, facteur)) marque = '<span class="ing-stock peu" title="Votre stock : ' + U.esc(S.texteQuantite(src)) + '">🏠 pas assez</span>';
+          else if (src) marque = '<span class="ing-stock" title="' + (src === ligne[0] ? 'Dans mon stock' : 'J\'ai : ' + U.esc(S.nom(src))) + '">🏠</span>';
+        }
         return '<li class="' + (coches[i] ? 'coche' : '') + '"><label>' +
           '<input type="checkbox" data-i="' + i + '"' + (coches[i] ? ' checked' : '') + '>' +
-          '<span class="ing-qte">' + U.esc(a.qte) + '</span><span class="ing-nom">' + U.esc(a.nom) + '</span></label></li>';
+          '<span class="ing-qte">' + U.esc(a.qte) + '</span><span class="ing-nom">' + U.esc(a.nom) + marque + '</span></label></li>';
       }).join('');
+      majStock();
 
       var n = r.nutrition.parPortion, t = r.nutrition.total, rep = M.repartition(n);
       var cibles = D.cibles();
@@ -198,6 +208,32 @@
           : '<p class="objectif-part"><a href="#/profil">🎯 Définir mes objectifs</a> pour voir la part de mes besoins du jour.</p>') +
         '<div class="total"><b>Total pour ' + U.pluriel(portions, 'portion') + '</b>' +
           '<span>' + U.r(t.kcal * facteur) + ' kcal · P ' + U.r(t.p * facteur) + ' g · G ' + U.r(t.g * facteur) + ' g · L ' + U.r(t.l * facteur) + ' g</span></div>';
+    }
+
+    // Mon stock : ce que j'ai déjà, ce qui manque pour le nombre de portions choisi.
+    function manquantes() {
+      var S = window.Stock, facteur = portions / r.portions;
+      return r.ing.filter(function (l) {
+        if ((l[2] || 'g') === 'qs' || l[0] === 'eau' || S.estBasique(l[0])) return false;
+        var src = S.source(l[0]);
+        if (!src) return true;
+        var g = S.grammes(src);
+        return g !== null && g < M.versGrammes(l, facteur);
+      });
+    }
+    function majStock() {
+      var S = window.Stock, zone = $('[data-stock-resume]');
+      $('[data-cuisinee]').hidden = !S.nombre() || !S.utilises(r, portions).length;
+      if (!S.nombre()) { zone.hidden = true; return; }
+      var a = S.analyser(r), manque = manquantes();
+      var nbManque = manque.map(function (l) { return l[0]; }).filter(function (id, i, t) { return t.indexOf(id) === i; }).length;
+      zone.hidden = false;
+      zone.className = 'stock-resume' + (manque.length ? '' : ' ok');
+      zone.innerHTML = manque.length
+        ? '🏠 Vous avez <b>' + (a.requis - nbManque) + ' / ' + a.requis + '</b> ingrédients' +
+          (a.maxPortions < portions && a.maxPortions >= 1 ? ' (assez pour ' + U.pluriel(a.maxPortions, 'portion') + ')' : '') +
+          ' <button class="lien" data-manquants>🛒 Ajouter ' + (nbManque > 1 ? 'les ' + nbManque + ' manquants' : 'le manquant') + ' aux courses</button>'
+        : '🏠 <b>Vous avez tout ce qu\'il faut</b>' + (S.basiques() ? ' (avec les basiques du placard)' : '') + ' !';
     }
 
     function changer(v) {
@@ -250,6 +286,44 @@
       D.ajouterAuxCourses(id, portions, false);
       U.toast('Ajouté aux courses pour ' + U.pluriel(portions, 'portion'));
       window.App.majBadges();
+    });
+    $('[data-stock-resume]').addEventListener('click', function (e) {
+      if (!e.target.closest('[data-manquants]')) return;
+      var facteur = portions / r.portions, n = 0;
+      manquantes().forEach(function (l) {
+        // S'il en reste un peu, on n'achète que la différence.
+        var src = window.Stock.source(l[0]), g = src && window.Stock.grammes(src), besoin = M.versGrammes(l, facteur);
+        var part = g !== null && g > 0 && besoin > 0 ? (besoin - g) / besoin : 1;
+        var a = M.afficherLigne(l, facteur * part);
+        var texte = a.nom + ' — ' + a.qte + ' (' + r.nom + ')';
+        if (D.courses.libres.some(function (x) { return x.texte === texte; })) return;
+        D.courses.libres.push({ id: U.aleatoire(), texte: texte });
+        n++;
+      });
+      D.sauver('courses');
+      window.App.majBadges();
+      U.toast(n ? U.pluriel(n, 'article ajouté', 'articles ajoutés') + ' aux courses' : 'Déjà dans la liste de courses');
+    });
+    $('[data-cuisinee]').addEventListener('click', function () {
+      var S = window.Stock, utilises = S.utilises(r, portions);
+      U.modal('Vous avez cuisiné « ' + r.nom + ' »',
+        '<p class="aide">Pour ' + U.pluriel(portions, 'portion') + '. Les quantités suivies sont déduites de votre stock. Cochez ce qu\'il ne vous reste plus.</p>' +
+        '<ul class="stock-cuisinee">' + utilises.map(function (e) {
+          var fini = e.suivi && !(e.reste > 0.01);
+          var reste = e.suivi ? (fini ? 'épuisé' : 'reste ' + S.formater(e.id, e.reste, e.unite)) : '';
+          return '<li><label class="case"><input type="checkbox" data-fini="' + e.id + '"' + (fini ? ' checked' : '') + '> Plus de ' + U.esc(S.nom(e.id)) +
+            (reste ? ' <small>(' + reste + ')</small>' : '') + '</label></li>';
+        }).join('') + '</ul>' +
+        '<div class="modal-actions"><button class="bouton bouton-principal" data-ok>Mettre à jour mon stock</button></div>',
+        function (m) {
+          m.el.querySelector('[data-ok]').addEventListener('click', function () {
+            var finis = [].slice.call(m.el.querySelectorAll('[data-fini]:checked')).map(function (c) { return c.dataset.fini; });
+            S.consommer(utilises, finis);
+            m.fermer();
+            U.toast('Stock mis à jour' + (finis.length ? ' · ' + U.pluriel(finis.length, 'ingrédient retiré', 'ingrédients retirés') : ''));
+            majPortions();
+          });
+        });
     });
     var suppr = $('[data-supprimer]');
     if (suppr) suppr.addEventListener('click', function () {
