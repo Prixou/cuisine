@@ -18,10 +18,10 @@ const charger = (fichier) => vm.runInContext(fs.readFileSync(path.join(racine, f
 const html = fs.readFileSync(path.join(racine, 'index.html'), 'utf8');
 const tousScripts = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]);
 // Seules les données et le moteur sont chargés ici (pas l'interface).
-const scripts = tousScripts.filter((s) => /^js\/(ingredients|categories|moteur|photos-recettes|batch|prix|recettes\/)/.test(s));
+const scripts = tousScripts.filter((s) => /^js\/(ingredients|categories|moteur|photos-recettes|batch|prix|onepot|recettes\/)/.test(s));
 scripts.forEach(charger);
 
-const { INGREDIENTS, RECETTES, Moteur, CATEGORIES, PHOTOS_RECETTES, BATCH, PRIX } = contexte.window;
+const { INGREDIENTS, RECETTES, Moteur, CATEGORIES, PHOTOS_RECETTES, BATCH, PRIX, ONE_POT } = contexte.window;
 const erreurs = [];
 const avertissements = [];
 
@@ -121,6 +121,18 @@ if (BATCH) {
       if (repas && !['petitdej', 'dejeuner', 'diner', 'collation'].includes(repas)) erreurs.push(`session ${s.id} : repas inconnu "${repas}"`);
     });
   });
+}
+
+// ---------- One pot ----------
+if (ONE_POT) {
+  const idsR = new Set(RECETTES.map((r) => r.id));
+  const ustensiles = new Set(ONE_POT.USTENSILES.map((u) => u.id));
+  Object.entries(ONE_POT.RECETTES).forEach(([id, [u, style]]) => {
+    if (!idsR.has(id)) erreurs.push(`onepot.js : recette inconnue "${id}"`);
+    if (!ustensiles.has(u)) erreurs.push(`onepot.js : ustensile inconnu "${u}" pour ${id}`);
+    if (!['healthy', 'gourmand'].includes(style)) erreurs.push(`onepot.js : style inconnu "${style}" pour ${id}`);
+  });
+  RECETTES.filter((r) => r.cuisine === 'One pot' && !ONE_POT.RECETTES[r.id]).forEach((r) => erreurs.push(`onepot.js : ${r.id} n'a pas d'ustensile`));
 }
 
 // ---------- Prix ----------

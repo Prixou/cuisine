@@ -3,7 +3,7 @@
   'use strict';
 
   var D = window.D, V = window.Vues;
-  var App = window.App = { installation: null, VERSION: 7 };   // à changer avec CACHE dans sw.js
+  var App = window.App = { installation: null, VERSION: 8 };   // à changer avec CACHE dans sw.js
 
   var NAV = [
     { route: '', emoji: '📖', nom: 'Recettes' },
@@ -18,6 +18,7 @@
     '': V.liste,
     recettes: V.liste,
     batch: V.batch,
+    onepot: V.onepot,
     recette: V.recette,
     courses: V.courses,
     planning: V.planning,
@@ -47,7 +48,7 @@
     var morceaux = location.hash.replace(/^#\/?/, '').split('/').map(decodeURIComponent);
     var nom = morceaux[0] || '';
     if (!ROUTES[nom]) nom = '';
-    var section = nom === 'recettes' || nom === 'recette' || nom === 'nouvelle' || nom === 'modifier' || nom === 'dupliquer' ? '' : nom;
+    var section = nom === 'recettes' || nom === 'onepot' || nom === 'recette' || nom === 'nouvelle' || nom === 'modifier' || nom === 'dupliquer' ? '' : nom;
     document.querySelectorAll('[data-nav] a').forEach(function (a) {
       if (a.dataset.route === section) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
     });
