@@ -65,6 +65,10 @@
               '<li>🔪 Préparation <b>' + U.duree(r.prep) + '</b></li>' +
               (r.cuisson ? '<li>🔥 Cuisson <b>' + U.duree(r.cuisson) + '</b></li>' : '<li>❄️ Sans cuisson</li>') +
               '<li>📊 <b>' + C.DIFFICULTES[r.diff] + '</b></li>' +
+              (function () {
+                var Bu = window.Budget, m = Bu.magasin(), c = Bu.coutRecette(r, m);
+                return c.total > 0 ? '<li title="Prix indicatif des quantités utilisées chez ' + U.esc(Bu.nomMagasin(m)) + ' (' + window.PRIX.date + ')">💶 <b>' + Bu.euros(c.parPortion) + '</b> / portion</li>' : '';
+              })() +
               (r.nutrition.regimes.vegan ? '<li>🌱 Vegan</li>' : r.nutrition.regimes.vegetarien ? '<li>🥕 Végétarien</li>' : '') +
               (r.nutrition.regimes.sansGluten ? '<li>🌾 Sans gluten*</li>' : '') +
               (notes.etoiles ? '<li>' + C.etoiles(notes.etoiles) + '</li>' : '') +

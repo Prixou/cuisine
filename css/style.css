@@ -1131,3 +1131,44 @@ details.chez-moi .articles { margin-top: 10px; }
 details.chez-moi .articles li { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; opacity: .75; }
 
 .actions-bas .bouton { white-space: normal; }
+
+/* ---------- Prix ---------- */
+.budget h2 { margin-bottom: 10px; }
+
+.budget-magasins { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.budget-magasin { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 8px; border: 2px solid var(--bord); border-radius: 12px; background: var(--surface); color: var(--texte); font: inherit; cursor: pointer; }
+
+.budget-magasin span { font-weight: 600; color: var(--texte-2); }
+
+.budget-magasin b { font-size: 1.45rem; font-variant-numeric: tabular-nums; }
+
+.budget-magasin small { font-size: .74rem; color: var(--vege); font-weight: 700; }
+
+.budget-magasin[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-doux); }
+
+.budget-caddie { margin: 10px 0 0; font-size: .92rem; }
+
+.budget .aide { margin: 10px 0 0; }
+
+.article-prix { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 1px; margin-left: 10px; padding: 4px 6px; border: 0; border-radius: 8px; background: none; color: var(--texte); font: inherit; cursor: pointer; text-align: right; max-width: 42%; }
+
+.article-prix:hover { background: var(--surface-2); }
+
+.article-prix b { font-size: .92rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.article-prix small { font-size: .7rem; color: var(--texte-2); line-height: 1.25; }
+
+.article-prix.perso b { color: var(--accent); }
+
+.article-prix.vide { color: var(--accent); font-size: .8rem; font-weight: 600; }
+
+.articles li.coche .article-prix { opacity: .45; }
+
+.prix-paquet { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 8px; }
+
+.article-qte { max-width: 7em; overflow-wrap: anywhere; line-height: 1.3; }
+
+.article-prix { max-width: 6.2em; }
+
+.article-prix small { overflow-wrap: anywhere; }

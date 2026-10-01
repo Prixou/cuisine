@@ -40,6 +40,82 @@
       return { groupes: aAcheter, chezMoi: chezMoi };
     }
 
+    // ---------- Prix ----------
+    var Bu = window.Budget;
+
+    function blocBudget(articles, coches) {
+      if (!articles.length) return '';
+      var t = Bu.totaux(articles), m = Bu.magasin();
+      var moinsCher = t.lidl.caisse <= t.leclerc.caisse ? 'lidl' : 'leclerc';
+      var ecart = Math.abs(t.lidl.caisse - t.leclerc.caisse);
+      var dansCaddie = coches.length ? Bu.totaux(coches)[m].caisse : 0;
+      var libres = D.courses.libres.length;
+      return '<section class="bloc budget">' +
+        '<h2>💶 Prix estimé</h2>' +
+        '<div class="budget-magasins" role="group" aria-label="Magasin">' + Bu.MAGASINS.map(function (x) {
+          return '<button class="budget-magasin" data-magasin="' + x + '" aria-pressed="' + (x === m) + '">' +
+            '<span>' + U.esc(Bu.nomMagasin(x)) + '</span><b>' + Bu.euros(t[x].caisse) + '</b>' +
+            (x === moinsCher && ecart >= 0.01 ? '<small>💚 le moins cher (−' + Bu.euros(ecart) + ')</small>' : '<small>&nbsp;</small>') + '</button>';
+        }).join('') + '</div>' +
+        (coches.length ? '<p class="budget-caddie">🛒 Déjà dans le caddie : <b>' + Bu.euros(dansCaddie) + '</b> · reste <b>' + Bu.euros(t[m].caisse - dansCaddie) + '</b></p>' : '') +
+        '<p class="aide">Ce que vous payez en caisse chez ' + U.esc(Bu.nomMagasin(m)) + ', en paquets entiers. Les recettes en utilisent pour <b>' + Bu.euros(t[m].utilise) +
+          '</b> : le reste des paquets (huile, épices, farine…) servira pour d\'autres repas.' +
+          (t[m].approx ? ' ' + U.pluriel(t[m].approx, 'article') + ' au prix de l\'autre magasin (marqué ≈).' : '') +
+          (libres ? ' Articles libres non comptés.' : '') +
+          ' Prix indicatifs (' + window.PRIX.date + ') : touchez un prix pour le corriger.</p>' +
+      '</section>';
+    }
+
+    function boutonPrix(a) {
+      var m = Bu.magasin();
+      var x = Bu.article(a.cle, Bu.grammes(a.cle, a.parts), m);
+      if (!x) return '<button class="article-prix vide" data-prix="' + U.esc(a.cle) + '" title="Indiquer un prix">＋ prix</button>';
+      var p = x.produit;
+      var detail = p.unite === 'kg' ? (x.poids ? Math.round(x.poids) + ' g au kilo' : 'au kilo') : (x.paquets > 1 ? x.paquets + ' × ' : '') + Bu.libelleUnite(p);
+      return '<button class="article-prix' + (p.perso ? ' perso' : '') + '" data-prix="' + U.esc(a.cle) + '" title="' +
+        (x.approx ? 'Prix ' + U.esc(Bu.nomMagasin(m === 'lidl' ? 'leclerc' : 'lidl')) + ' : produit rarement vendu chez ' + U.esc(Bu.nomMagasin(m)) + '. ' : '') + 'Toucher pour corriger le prix">' +
+        '<b>' + (x.approx ? '≈ ' : '') + Bu.euros(x.caisse) + '</b><small>' + U.esc(detail) + (p.perso ? ' ✏️' : '') + '</small></button>';
+    }
+
+    function modifierPrix(id) {
+      var p = Bu.produit(id) || { lidl: null, leclerc: null, qte: 1, unite: 'kg', libelle: '' };
+      var i = window.Moteur.infos(id);
+      var unites = [['kg', 'au kilo (prix au kg)'], ['g', 'grammes'], ['ml', 'ml']];
+      if (i && i.pc) unites.push(['pc', i.u ? i.u[1] : 'pièces']);
+      var champ = function (m) {
+        return '<label class="champ-groupe"><span>Prix chez ' + U.esc(Bu.nomMagasin(m)) + ' (€)</span>' +
+          '<input class="champ" type="number" min="0" step="0.01" inputmode="decimal" data-p="' + m + '" value="' + (p[m] > 0 ? p[m] : '') + '" placeholder="Pas vendu ici"></label>';
+      };
+      U.modal('Prix : ' + (i ? i.nom : id),
+        champ('lidl') + champ('leclerc') +
+        '<div class="champ-groupe"><span>Pour</span><div class="prix-paquet">' +
+          '<input class="champ" type="number" min="0" step="any" inputmode="decimal" data-qte value="' + p.qte + '" aria-label="Quantité du paquet"' + (p.unite === 'kg' ? ' disabled' : '') + '>' +
+          '<select class="champ" data-unite aria-label="Unité">' + unites.map(function (u) {
+            return '<option value="' + u[0] + '"' + (u[0] === p.unite ? ' selected' : '') + '>' + U.esc(u[1]) + '</option>';
+          }).join('') + '</select></div></div>' +
+        '<label class="champ-groupe"><span>Conditionnement (facultatif)</span><input class="champ" data-libelle value="' + U.esc(p.unite === 'kg' ? '' : p.libelle || '') + '" placeholder="Ex. : barquette 500 g"></label>' +
+        '<div class="modal-actions">' + (p.perso ? '<button class="bouton" data-defaut>Revenir au prix d\'origine</button>' : '') +
+          '<button class="bouton bouton-principal" data-ok>Enregistrer</button></div>',
+        function (md) {
+          var unite = md.el.querySelector('[data-unite]'), qte = md.el.querySelector('[data-qte]');
+          unite.addEventListener('change', function () { qte.disabled = unite.value === 'kg'; if (unite.value === 'kg') qte.value = 1; });
+          md.el.querySelector('[data-ok]').addEventListener('click', function () {
+            var v = {};
+            Bu.MAGASINS.forEach(function (m) { var x = Number(md.el.querySelector('[data-p="' + m + '"]').value); v[m] = x > 0 ? x : null; });
+            v.unite = unite.value;
+            v.qte = v.unite === 'kg' ? 1 : Number(qte.value);
+            v.libelle = md.el.querySelector('[data-libelle]').value.trim() || (v.unite === 'kg' ? 'au kilo' : v.qte + ' ' + (v.unite === 'pc' ? 'pièces' : v.unite));
+            if (!(v.lidl > 0 || v.leclerc > 0)) { U.toast('Indiquez au moins un prix'); return; }
+            if (!(v.qte > 0)) { U.toast('Indiquez la quantité du paquet'); return; }
+            Bu.corriger(id, v);
+            md.fermer();
+            rendre();
+          });
+          var defaut = md.el.querySelector('[data-defaut]');
+          if (defaut) defaut.addEventListener('click', function () { Bu.corriger(id, null); md.fermer(); rendre(); });
+        });
+    }
+
     function rendre() {
       var tri = trier(D.listeCourses());
       var groupes = tri.groupes;
@@ -50,9 +126,13 @@
       var faitsIngredients = cochesIngredients.length;
       var faits = faitsIngredients + D.courses.libres.filter(function (l) { return D.courses.coches['libre-' + l.id]; }).length;
 
+      var tousArticles = [];
+      groupes.forEach(function (g) { tousArticles = tousArticles.concat(g.articles); });
+
       app.innerHTML =
         '<div class="page-entete"><h1>🛒 Liste de courses</h1>' +
           (total ? '<p>' + faits + ' / ' + total + ' articles cochés</p>' : '') + '</div>' +
+        blocBudget(tousArticles, cochesIngredients) +
         (recettes.length || D.courses.libres.length ? '' :
           '<div class="vide"><p>Votre liste est vide.</p><p>Ouvrez une recette et touchez <b>🛒 Ajouter aux courses</b>, ou ajoutez toute une semaine depuis le <a href="#/planning">planning</a>.</p></div>') +
         (recettes.length ? '<section class="bloc"><h2>Recettes (' + recettes.length + ')</h2><ul class="courses-recettes">' +
@@ -70,7 +150,7 @@
               return '<li class="' + (coche ? 'coche' : '') + '"><label><input type="checkbox" data-cle="' + U.esc(a.cle) + '"' + (coche ? ' checked' : '') + '>' +
                 '<span class="article-nom">' + U.esc(a.nom) + '<small>' + U.esc(a.recettes.join(', ')) + '</small>' +
                 (a.note ? '<small class="article-stock">🏠 ' + U.esc(a.note) + '</small>' : '') + '</span>' +
-                '<span class="article-qte">' + U.esc(a.qte) + '</span></label></li>';
+                '<span class="article-qte">' + U.esc(a.qte) + '</span></label>' + boutonPrix(a) + '</li>';
             }).join('') + '</ul></section>';
         }).join('') +
         (tri.chezMoi.length ? '<details class="bloc chez-moi"><summary><b>🏠 Déjà chez moi</b> <small>' + U.pluriel(tri.chezMoi.length, 'article') + ' retiré' + (tri.chezMoi.length > 1 ? 's' : '') + ' de la liste</small></summary><ul class="articles">' +
@@ -138,12 +218,22 @@
       var partager = app.querySelector('[data-partager]');
       if (partager) partager.addEventListener('click', function () {
         var texte = texteListe(groupes);
+        if (tousArticles.length) {
+          var tt = Bu.totaux(tousArticles), mm = Bu.magasin();
+          texte += '\n\n💶 Estimation ' + Bu.nomMagasin(mm) + ' : ' + Bu.euros(tt[mm].caisse);
+        }
         if (navigator.share) {
           navigator.share({ title: 'Liste de courses', text: texte }).catch(function () {});
         } else if (navigator.clipboard) {
           navigator.clipboard.writeText(texte).then(function () { U.toast('Liste copiée dans le presse-papiers'); },
             function () { U.toast('Copie impossible'); });
         }
+      });
+      app.querySelectorAll('[data-magasin]').forEach(function (b) {
+        b.addEventListener('click', function () { Bu.definirMagasin(b.dataset.magasin); rendre(); });
+      });
+      app.querySelectorAll('[data-prix]').forEach(function (b) {
+        b.addEventListener('click', function () { modifierPrix(b.dataset.prix); });
       });
       var masquer = app.querySelector('[data-masquer-stock]');
       if (masquer) masquer.addEventListener('change', function () { D.courses.masquerStock = masquer.checked; D.sauver('courses'); rendre(); });

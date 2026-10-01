@@ -18,10 +18,10 @@ const charger = (fichier) => vm.runInContext(fs.readFileSync(path.join(racine, f
 const html = fs.readFileSync(path.join(racine, 'index.html'), 'utf8');
 const tousScripts = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]);
 // Seules les données et le moteur sont chargés ici (pas l'interface).
-const scripts = tousScripts.filter((s) => /^js\/(ingredients|categories|moteur|photos-recettes|batch|recettes\/)/.test(s));
+const scripts = tousScripts.filter((s) => /^js\/(ingredients|categories|moteur|photos-recettes|batch|prix|recettes\/)/.test(s));
 scripts.forEach(charger);
 
-const { INGREDIENTS, RECETTES, Moteur, CATEGORIES, PHOTOS_RECETTES, BATCH } = contexte.window;
+const { INGREDIENTS, RECETTES, Moteur, CATEGORIES, PHOTOS_RECETTES, BATCH, PRIX } = contexte.window;
 const erreurs = [];
 const avertissements = [];
 
@@ -113,6 +113,23 @@ if (BATCH) {
       if (!(portions > 0)) erreurs.push(`session ${s.id} : portions invalides pour ${id}`);
       if (repas && !['petitdej', 'dejeuner', 'diner', 'collation'].includes(repas)) erreurs.push(`session ${s.id} : repas inconnu "${repas}"`);
     });
+  });
+}
+
+// ---------- Prix ----------
+if (PRIX) {
+  Object.keys(INGREDIENTS).forEach((id) => { if (id !== 'eau' && !PRIX.produits[id]) erreurs.push(`prix.js : aucun prix pour ${id}`); });
+  Object.entries(PRIX.produits).forEach(([id, p]) => {
+    const i = Moteur.infos(id);
+    if (!i) { erreurs.push(`prix.js : ingrédient inconnu "${id}"`); return; }
+    const [lidl, leclerc, qte, unite, libelle] = p;
+    if (![lidl, leclerc].some((x) => x > 0)) erreurs.push(`prix.js : ${id} n'a de prix dans aucun magasin`);
+    if ([lidl, leclerc].some((x) => x !== null && !(x > 0))) erreurs.push(`prix.js : prix invalide pour ${id}`);
+    if (!['g', 'ml', 'pc', 'kg'].includes(unite) || !(qte > 0) || !libelle) erreurs.push(`prix.js : conditionnement invalide pour ${id}`);
+    if (unite === 'pc' && !i.pc) erreurs.push(`prix.js : ${id} vendu à la pièce sans poids unitaire dans ingredients.js`);
+    if (unite === 'kg' && qte !== 1) erreurs.push(`prix.js : ${id} au kilo doit avoir la quantité 1`);
+    // Écart suspect entre les deux enseignes (erreur de saisie ?)
+    if (lidl > 0 && leclerc > 0 && Math.max(lidl, leclerc) / Math.min(lidl, leclerc) > 1.5) avertissements.push(`prix.js : écart Lidl / Leclerc important pour ${id}`);
   });
 }
 

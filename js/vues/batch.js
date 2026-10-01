@@ -170,10 +170,11 @@
     function rendre() {
       var f = st.facteur;
       var lignes = recettesSession(s);
-      var total = { kcal: 0, p: 0, portions: 0 };
+      var total = { kcal: 0, p: 0, portions: 0, euros: 0 };
       lignes.forEach(function (x) {
         var n = D.parId[x[0]].nutrition.parPortion;
         total.kcal += n.kcal * x[1] * f; total.p += n.p * x[1] * f; total.portions += x[1] * f;
+        total.euros += window.Budget.coutRecette(D.parId[x[0]]).parPortion * x[1] * f;
       });
       var faites = st.faites.filter(function (i) { return i < s.plan.length; }).length;
 
@@ -189,6 +190,7 @@
                 '<li>⏱ En cuisine <b>' + U.duree(Math.round(s.duree * (f > 1 ? 1 + (f - 1) * 0.4 : 1))) + '</b></li>' +
                 '<li>🍽️ <b>' + U.r(total.portions) + ' portions</b></li>' +
                 '<li>🔥 <b>' + U.r(total.kcal / total.portions) + ' kcal</b> par portion en moyenne</li>' +
+                '<li title="Prix indicatif des quantités utilisées chez ' + U.esc(window.Budget.nomMagasin(window.Budget.magasin())) + '">💶 ≈ <b>' + window.Budget.euros(total.euros) + '</b> (' + window.Budget.euros(total.euros / total.portions) + ' / portion)</li>' +
               '</ul>' +
               '<div class="carte-badges">' + s.tags.map(function (t) { return '<span class="badge badge-batch">' + U.esc(B.TAGS[t] || t) + '</span>'; }).join('') + '</div>' +
             '</div>' +
