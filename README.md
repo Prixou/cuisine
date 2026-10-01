@@ -5,7 +5,7 @@ Application web de cuisine : **500 recettes** du monde entier, quantités ajusta
 ## Utilisation
 
 - **En local** : ouvrez `index.html` dans un navigateur. Tout fonctionne, sauf l'installation et le hors-ligne, qui exigent une adresse http(s).
-- **En ligne (recommandé)** : activez GitHub Pages (Settings → Pages → branche `main`, dossier `/`). Ouvrez ensuite l'adresse sur votre téléphone puis « Ajouter à l'écran d'accueil ».
+- **En ligne (recommandé)** : dans Settings → Pages, choisissez la source **GitHub Actions**. Le workflow `.github/workflows/pages.yml` vérifie les recettes puis publie l'application à chaque mise à jour de `main` (relance manuelle possible dans l'onglet Actions). Ouvrez ensuite `https://<utilisateur>.github.io/cuisine/` sur votre téléphone puis « Ajouter à l'écran d'accueil ».
 
 ## Fonctionnalités
 
