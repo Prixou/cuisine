@@ -3,7 +3,7 @@
   'use strict';
 
   var D = window.D, V = window.Vues;
-  var App = window.App = { installation: null, VERSION: 8 };   // à changer avec CACHE dans sw.js
+  var App = window.App = { installation: null, VERSION: 9 };   // à changer avec CACHE dans sw.js
 
   var NAV = [
     { route: '', emoji: '📖', nom: 'Recettes' },

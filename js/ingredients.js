@@ -352,6 +352,19 @@ window.INGREDIENTS = {
   estragon: ['Estragon', 'herbes', 50, 3.4, 6, 1.1, 4],
   citronnelle: ['Citronnelle', 'herbes', 100, 1.8, 25, 0.5, 0, { pc: 15, u: ['tige', 'tiges'] }],
 
+  // ---------- Sans lactose (même valeurs nutritionnelles que les produits laitiers d'origine) ----------
+  lait_sl: ['Lait demi-écrémé sans lactose', 'cremerie', 46, 3.3, 4.8, 1.6, 0, { d: 1.03 }],
+  creme_30_sl: ['Crème liquide entière sans lactose', 'cremerie', 292, 2.2, 3, 30, 0],
+  creme_15_sl: ['Crème légère sans lactose', 'cremerie', 165, 2.6, 4, 15, 0],
+  creme_epaisse_sl: ['Crème fraîche épaisse sans lactose', 'cremerie', 300, 2.4, 2.7, 30, 0],
+  margarine: ['Margarine végétale (sans lactose)', 'cremerie', 630, 0.2, 0.5, 70, 0, { d: 0.95 }],
+  fromage_blanc_sl: ['Fromage blanc sans lactose', 'cremerie', 75, 7, 3.5, 3.4, 0],
+  yaourt_sl: ['Yaourt nature sans lactose', 'cremerie', 57, 4.2, 5, 2, 0, { pc: 125, pl: 'Yaourts nature sans lactose' }],
+  yaourt_grec_sl: ['Yaourt à la grecque sans lactose', 'cremerie', 125, 3.5, 4, 10, 0],
+  skyr_sl: ['Skyr ou yaourt protéiné sans lactose', 'cremerie', 60, 10.5, 4, 0.2, 0],
+  mozzarella_sl: ['Mozzarella sans lactose', 'cremerie', 240, 18, 1, 18, 0, { pc: 125, u: ['boule', 'boules'] }],
+  fromage_frais_sl: ['Fromage frais sans lactose', 'cremerie', 250, 5.5, 4, 24, 0],
+
   // ---------- Protéines végétales ----------
   tofu: ['Tofu ferme', 'epicerie', 125, 13, 1.5, 7.5, 1],
   tofu_soyeux: ['Tofu soyeux', 'epicerie', 55, 5, 2, 2.7, 0.3],

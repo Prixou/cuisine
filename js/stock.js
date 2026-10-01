@@ -67,6 +67,11 @@
     { id: 'petitdej', nom: 'Petit-déjeuner', emoji: '🥣', ids: ['flocons_avoine', 'banane', 'pain', 'confiture', 'cafe', 'lait_demi', 'miel'] }
   ];
 
+  /* Ingrédients d'un kit, en version sans lactose si le réglage est activé. */
+  S.idsKit = function (kit) {
+    return D.sansLactose() ? kit.ids.map(window.SansLactose.remplacant) : kit.ids;
+  };
+
   function f() {
     var x = D.frigo;
     if (!x.ingredients) x.ingredients = [];

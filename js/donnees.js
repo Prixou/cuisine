@@ -36,18 +36,37 @@
       temps: (r.prep || 0) + (r.cuisson || 0),
       proteine: n.kcal > 0 && n.p >= 25 && n.p * 4 / n.kcal >= 0.25,
       leger: n.kcal < 400,
+      lactose: window.SansLactose.analyser(r),
       texte: U.normaliser([r.nom, r.cuisine, r.cat, r.desc, noms].join(' '))
     });
   }
 
+  /* Intolérance au lactose (Objectifs) : toute l'application utilise les versions sans lactose. */
+  D.sansLactose = function () { return !!(D.profil && D.profil.sansLactose); };
+
+  var versions = {};
   D.rafraichir = function () {
-    D.recettes = window.RECETTES.concat(D.mesRecettes).map(preparer);
+    var sl = D.sansLactose();
+    versions = {};
+    D.recettes = window.RECETTES.concat(D.mesRecettes).map(function (r) { return preparer(sl ? window.SansLactose.adapter(r) : r); });
     D.parId = {};
     D.recettes.forEach(function (r) { D.parId[r.id] = r; });
     D.cuisines = Array.from(new Set(D.recettes.map(function (r) { return r.cuisine; })))
       .sort(function (a, b) { return a.localeCompare(b, 'fr'); });
   };
   D.rafraichir();
+
+  /* Une recette dans la version voulue (sans lactose ou d'origine), quel que soit le réglage. */
+  D.version = function (id, sansLactose) {
+    var r = D.parId[id];
+    if (!r || sansLactose === undefined || !!r.versionSansLactose === !!sansLactose || !r.lactose.remplacements.length) return r;
+    var cle = id + (sansLactose ? '|sl' : '|origine');
+    if (!versions[cle]) {
+      var source = window.RECETTES.concat(D.mesRecettes).find(function (x) { return x.id === id; });
+      versions[cle] = preparer(sansLactose ? window.SansLactose.adapter(source) : source);
+    }
+    return versions[cle];
+  };
 
   D.estFavori = function (id) { return D.favoris.indexOf(id) !== -1; };
   D.basculerFavori = function (id) {
@@ -61,6 +80,7 @@
     vegetarien: { nom: 'Végétarien', test: function (r) { return r.nutrition.regimes.vegetarien; } },
     vegan: { nom: 'Vegan', test: function (r) { return r.nutrition.regimes.vegan; } },
     sansGluten: { nom: 'Sans gluten', test: function (r) { return r.nutrition.regimes.sansGluten; } },
+    sansLactose: { nom: 'Sans lactose (ou adaptable)', test: function (r) { return r.lactose.statut !== 'partiel'; } },
     proteine: { nom: 'Riche en protéines', test: function (r) { return r.proteine; } },
     leger: { nom: 'Léger (< 400 kcal)', test: function (r) { return r.leger; } }
   };
@@ -225,10 +245,11 @@
     { nom: 'Épices', emoji: '🧂', rayons: ['epices'] }
   ];
 
-  D.ajouterAuxCourses = function (id, portions, cumuler) {
+  D.ajouterAuxCourses = function (id, portions, cumuler, sansLactose) {
     var e = D.courses.recettes.find(function (x) { return x.id === id; });
     if (e) e.portions = cumuler ? e.portions + portions : portions;
-    else D.courses.recettes.push({ id: id, portions: portions });
+    else D.courses.recettes.push(e = { id: id, portions: portions });
+    if (sansLactose !== undefined) e.sl = !!sansLactose;
     D.sauver('courses');
   };
 
@@ -238,7 +259,7 @@
   D.listeCourses = function () {
     var agregat = {};
     D.courses.recettes.forEach(function (e) {
-      var r = D.parId[e.id];
+      var r = D.version(e.id, e.sl);
       if (!r) return;
       var f = e.portions / r.portions;
       r.ing.forEach(function (l) {

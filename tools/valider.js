@@ -18,10 +18,10 @@ const charger = (fichier) => vm.runInContext(fs.readFileSync(path.join(racine, f
 const html = fs.readFileSync(path.join(racine, 'index.html'), 'utf8');
 const tousScripts = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]);
 // Seules les données et le moteur sont chargés ici (pas l'interface).
-const scripts = tousScripts.filter((s) => /^js\/(ingredients|categories|moteur|photos-recettes|batch|prix|onepot|recettes\/)/.test(s));
+const scripts = tousScripts.filter((s) => /^js\/(ingredients|categories|moteur|photos-recettes|batch|prix|onepot|lactose|recettes\/)/.test(s));
 scripts.forEach(charger);
 
-const { INGREDIENTS, RECETTES, Moteur, CATEGORIES, PHOTOS_RECETTES, BATCH, PRIX, ONE_POT } = contexte.window;
+const { INGREDIENTS, RECETTES, Moteur, CATEGORIES, PHOTOS_RECETTES, BATCH, PRIX, ONE_POT, SansLactose } = contexte.window;
 const erreurs = [];
 const avertissements = [];
 
@@ -133,6 +133,28 @@ if (ONE_POT) {
     if (!['healthy', 'gourmand'].includes(style)) erreurs.push(`onepot.js : style inconnu "${style}" pour ${id}`);
   });
   RECETTES.filter((r) => r.cuisine === 'One pot' && !ONE_POT.RECETTES[r.id]).forEach((r) => erreurs.push(`onepot.js : ${r.id} n'a pas d'ustensile`));
+}
+
+// ---------- Sans lactose ----------
+if (SansLactose) {
+  const L = SansLactose;
+  Object.entries(L.REMPLACER).forEach(([de, [vers]]) => {
+    if (!INGREDIENTS[de]) erreurs.push(`lactose.js : ingrédient inconnu "${de}"`);
+    if (!INGREDIENTS[vers]) erreurs.push(`lactose.js : remplaçant inconnu "${vers}"`);
+  });
+  L.NATURELS.concat(Object.keys(L.PAUVRES), Object.keys(L.SANS_EQUIVALENT), L.A_VERIFIER).forEach((id) => {
+    if (!INGREDIENTS[id]) erreurs.push(`lactose.js : ingrédient inconnu "${id}"`);
+  });
+  const stats = { naturel: 0, adaptable: 0, partiel: 0 };
+  RECETTES.forEach((r) => {
+    stats[L.analyser(r).statut]++;
+    // Chaque ligne adaptée doit rester calculable (une pièce doit avoir un poids).
+    L.adapter(r).ing.forEach((l) => {
+      const i = Moteur.infos(l[0]);
+      if ((l[2] || 'g') === 'pc' && !i.pc) erreurs.push(`${r.id} (sans lactose) : ${l[0]} en pièces sans poids unitaire`);
+    });
+  });
+  if (process.argv.includes('--lactose')) console.log('Sans lactose :', stats);
 }
 
 // ---------- Prix ----------
