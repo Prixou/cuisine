@@ -14,6 +14,7 @@ Application web de cuisine : **599 recettes** du monde entier, dont des recettes
 | 📖 **Recettes** | 599 recettes, 14 catégories, plus de 60 cuisines, dont 36 recettes healthy tendance (cottage cheese, protéines, fibres, chou…). Recherche par nom ou ingrédient. Filtres par cuisine, temps, régime (végétarien, vegan, sans gluten), riche en protéines, léger. Tri par calories, protéines, temps, mes notes ou « adapté à mes objectifs ». |
 | 🍲 **One pot** | Tout le repas dans une seule casserole, une poêle, une plaque ou un plat. 30 recettes tendance (orzo au Boursin, French onion pasta, soupe lasagne, gnocchis à la plaque, pâtes alla vodka, poulet harissa à la plaque, pasta e ceci, shakshuka verte…), plus 41 recettes du catalogue qui se font déjà en un seul récipient. Elles sont rangées par ustensile, avec des filtres healthy / gourmand / 30 min max et des conseils pour réussir. On y accède par le bandeau en haut des recettes ou par la puce « 🍲 One pot ». |
 | 🍱 **Batch cooking** | 8 sessions clés en main (healthy, gourmande en famille, végétarienne, protéinée, petit budget, congélateur plein, express 1 h, mijotés d'hiver). Chaque session donne l'ordre des étapes avec minuteurs, la quantité ajustable (½ à 2×), tout l'ajout aux courses en un geste et la **répartition automatique dans le planning** : ce qui se garde le moins est mangé en premier, ce qui ne se congèle pas avant sa date limite. 33 recettes pensées pour cuisiner en quantité, durée de conservation (frigo / congélateur) et façon de réchauffer pour plus de 210 recettes, filtre « 🍱 Batch cooking » dans la liste. |
+| 🥛 **Sans lactose** | Chaque recette qui contient du lactose a sa version sans lactose. Elle remplace le lait, la crème, les yaourts, le fromage blanc, les fromages frais et la mozzarella par leur équivalent sans lactose, et le beurre par de la margarine. Les fromages affinés (parmesan, comté, emmental, cheddar, camembert…) sont gardés, car ils sont naturellement presque sans lactose. Les produits transformés à vérifier sur l'étiquette sont signalés. La fiche détaille chaque remplacement et permet de passer d'une version à l'autre. Dans Objectifs, « Je suis intolérant(e) au lactose » applique les versions sans lactose partout : recettes, valeurs nutritionnelles, courses, prix et kits du stock. Le filtre « Sans lactose (ou adaptable) » est disponible dans la liste. |
 | ⚖️ **Portions** | Toutes les quantités sont recalculées et arrondies intelligemment (½, ¼, kg, L, cuillères, gousses, tranches…). |
 | 🔥 **Macros** | kcal, protéines, glucides, lipides, fibres par portion et au total, répartition des calories, part de vos besoins du jour. |
 | 🛒 **Liste de courses** | Ajout d'une recette (ou de toute la semaine du planning) avec ses portions. Les ingrédients sont additionnés et rangés par rayon. Articles libres, cases à cocher, partage / copie. |
@@ -30,7 +31,7 @@ Application web de cuisine : **599 recettes** du monde entier, dont des recettes
 
 ## Calcul des macros
 
-Chaque ingrédient a ses valeurs pour 100 g dans `js/ingredients.js` (≈ 320 ingrédients, d'après les tables **CIQUAL** (Anses) et **USDA**, arrondies).
+Chaque ingrédient a ses valeurs pour 100 g dans `js/ingredients.js` (≈ 330 ingrédients, d'après les tables **CIQUAL** (Anses) et **USDA**, arrondies).
 Les recettes indiquent leurs ingrédients en g, ml, pièces ou cuillères. Le moteur (`js/moteur.js`) convertit tout en grammes (poids moyen d'une pièce, densité) puis additionne.
 Les valeurs sont **indicatives** : elles portent sur les ingrédients crus, sans les ingrédients « selon goût », et l'huile de friture est comptée pour la seule part absorbée.
 
@@ -51,6 +52,7 @@ js/stock.js                 mon stock : ingrédients chez moi, quantités, recet
 js/prix.js                  prix indicatifs Lidl et E.Leclerc par conditionnement
 js/budget.js                coût des courses et des recettes
 js/onepot.js                one pot : ustensile et style (healthy / gourmand) de chaque recette
+js/lactose.js               sans lactose : remplacements, fromages affinés, ingrédients à vérifier
 js/batch.js                 batch cooking : conservation, réchauffage, sessions
 js/donnees.js               données perso, objectifs, planning, courses, photos
 js/photos-auto.js           recherche des photos sur Wikimedia, cache, crédits

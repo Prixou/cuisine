@@ -79,6 +79,7 @@
         '<label><span>Régime / objectif</span><select data-filtre="regime">' + options(Object.keys(D.REGIMES).map(function (k) { return [k, D.REGIMES[k].nom]; }), etat.regime, 'Tous') + '</select></label>' +
         '<label><span>Trier par</span><select data-filtre="tri">' + options(tris, etat.tri) + '</select></label>' +
       '</div>' +
+      (D.sansLactose() ? '<p class="mode-lactose">🥛 Mode sans lactose : les recettes sont adaptées automatiquement (<a href="#/profil">réglage</a>).</p>' : '') +
       '<div class="resultats-entete"><p>' + U.pluriel(resultats.length, 'recette') + '</p>' +
         (actifs ? '<button class="lien" data-reinit>Réinitialiser les filtres</button>' : '') + '</div>' +
       (resultats.length

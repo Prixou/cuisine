@@ -32,9 +32,34 @@
     '</section>';
   }
 
+  /* Bloc « sans lactose » : ce qui est remplacé, ce qui est naturellement sans lactose, ce qu'il faut vérifier. */
+  function blocLactose(r) {
+    var a = r.lactose, nom = function (id) { var i = M.infos(id); return i ? i.nom : id; };
+    var lien = '#/recette/' + encodeURIComponent(r.id) + '/';
+    var notes = (a.naturels.length ? '<p>🧀 ' + U.esc(a.naturels.map(nom).join(', ')) + ' : fromage' + (a.naturels.length > 1 ? 's' : '') + ' affiné' + (a.naturels.length > 1 ? 's' : '') + ', naturellement sans lactose.</p>' : '') +
+      a.pauvres.map(function (x) { return '<p>🟢 ' + U.esc(x.conseil) + '</p>'; }).join('') +
+      (a.aVerifier.length ? '<p>🔎 À vérifier sur l\'étiquette (peut contenir du lait) : ' + U.esc(a.aVerifier.map(nom).join(', ')) + '.</p>' : '');
+    if (!a.lactose) return notes && D.sansLactose() ? '<section class="bloc lactose ok"><h2>🥛 Sans lactose</h2>' + notes + '</section>' : '';
+    if (!r.versionSansLactose) {
+      return '<section class="bloc lactose"><div class="lactose-ligne"><span>🥛 <b>Contient du lactose</b> : ' +
+        U.esc(a.remplacements.map(function (x) { return x.libelle || nom(x.de); }).concat(a.sansEquivalent.map(function (x) { return nom(x.id); })).join(', ')) + '</span>' +
+        (a.remplacements.length ? '<a class="bouton bouton-petit bouton-principal" href="' + lien + 'sans-lactose">Version sans lactose</a>' : '') + '</div></section>';
+    }
+    return '<section class="bloc lactose ok"><div class="lactose-ligne"><h2>🥛 Version sans lactose</h2>' +
+        '<a class="lien" href="' + lien + 'origine">Voir la recette d\'origine</a></div>' +
+      '<ul class="lactose-remplacements">' + a.remplacements.map(function (x) {
+        return '<li><span>' + U.esc(x.libelle || nom(x.de)) + '</span><b>→ ' + U.esc(nom(x.vers)) + '</b>' + (x.conseil ? '<small>' + U.esc(x.conseil) + '</small>' : '') + '</li>';
+      }).join('') + '</ul>' +
+      a.sansEquivalent.map(function (x) { return '<p class="lactose-attention">⚠️ ' + U.esc(nom(x.id)) + ' : ' + U.esc(x.conseil) + '</p>'; }).join('') +
+      notes +
+      '<p class="aide">Les quantités, les valeurs nutritionnelles, les courses et le prix suivent la version sans lactose.</p>' +
+    '</section>';
+  }
+
   window.Vues.recette = function (app, params) {
     var id = params[0];
-    var r = D.parId[id];
+    // #/recette/id/sans-lactose ou #/recette/id/origine : version choisie, sinon celle du réglage (Objectifs).
+    var r = D.version(id, params[1] === 'sans-lactose' ? true : params[1] === 'origine' ? false : undefined);
     if (!r) {
       app.innerHTML = '<div class="vide"><p>Cette recette n\'existe pas ou a été supprimée.</p><a class="bouton" href="#/">← Retour aux recettes</a></div>';
       return;
@@ -71,6 +96,8 @@
               })() +
               (r.nutrition.regimes.vegan ? '<li>🌱 Vegan</li>' : r.nutrition.regimes.vegetarien ? '<li>🥕 Végétarien</li>' : '') +
               (r.nutrition.regimes.sansGluten ? '<li>🌾 Sans gluten*</li>' : '') +
+              (!r.lactose.lactose ? '<li title="Aucun ingrédient riche en lactose' + (r.lactose.naturels.length ? ' (fromages affinés naturellement sans lactose)' : '') + '">🥛 Sans lactose' + (r.lactose.aVerifier.length ? '*' : '') + '</li>'
+                : r.versionSansLactose ? '<li>🥛 Version sans lactose</li>' : '') +
               (notes.etoiles ? '<li>' + C.etoiles(notes.etoiles) + '</li>' : '') +
             '</ul>' +
           '</div>' +
@@ -84,6 +111,7 @@
             : '<a class="bouton" href="#/dupliquer/' + encodeURIComponent(id) + '" title="Créer votre propre version modifiable">✏️ Adapter à ma façon</a>') +
         '</div>' +
 
+        blocLactose(r) +
         '<div class="fiche-grille">' +
           '<div class="fiche-gauche">' +
             '<section class="bloc portions-bloc">' +
@@ -287,7 +315,7 @@
     // Planning & courses
     $('[data-planifier]').addEventListener('click', function () { C.planifier(r, 1); });
     $('[data-courses]').addEventListener('click', function () {
-      D.ajouterAuxCourses(id, portions, false);
+      D.ajouterAuxCourses(id, portions, false, r.lactose.remplacements.length ? !!r.versionSansLactose : undefined);
       U.toast('Ajouté aux courses pour ' + U.pluriel(portions, 'portion'));
       window.App.majBadges();
     });

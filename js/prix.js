@@ -116,6 +116,19 @@
       lait_concentre: [1.69, 1.65, 397, 'g', 'boîte 397 g'],
       cottage: [1.29, 1.35, 200, 'g', 'pot 200 g'],
 
+      // Sans lactose (rayon crèmerie « sans lactose »)
+      lait_sl: [1.15, 1.19, 1000, 'ml', 'bouteille 1 L'],
+      creme_30_sl: [1.69, 1.65, 200, 'ml', 'brique 20 cl'],
+      creme_15_sl: [1.59, 1.55, 200, 'ml', 'brique 20 cl'],
+      creme_epaisse_sl: [null, 1.89, 200, 'g', 'pot 20 cl'],
+      margarine: [1.49, 1.45, 500, 'g', 'barquette 500 g'],
+      fromage_blanc_sl: [null, 1.89, 400, 'g', 'pot 400 g'],
+      yaourt_sl: [1.69, 1.65, 4, 'pc', '4 pots'],
+      yaourt_grec_sl: [null, 1.99, 400, 'g', 'pot 400 g'],
+      skyr_sl: [1.49, 1.45, 200, 'g', 'pot 200 g'],
+      mozzarella_sl: [1.09, 1.15, 1, 'pc', 'boule 125 g'],
+      fromage_frais_sl: [null, 1.89, 150, 'g', '150 g'],
+
       // ---------- Épicerie ----------
       lait_coco: [1.19, 1.15, 400, 'ml', 'boîte 40 cl'],
       farine_sarrasin: [1.29, 1.25, 500, 'g', '500 g'],

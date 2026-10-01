@@ -107,7 +107,7 @@
         }).join('') + '</ul>' : (etat.recherche ? '<p class="vide-petit">Aucun ingrédient de ce nom.</p>' : '')) + '</div>' +
         '<p class="frigo-sous-titre">Remplir en un geste</p>' +
         '<div class="stock-kits">' + S.KITS.map(function (k) {
-          var manquent = k.ids.filter(function (id) { return !S.possede(id) && window.INGREDIENTS[id]; }).length;
+          var manquent = S.idsKit(k).filter(function (id) { return !S.possede(id) && window.INGREDIENTS[id]; }).length;
           return '<button class="bouton bouton-petit" data-kit="' + k.id + '"' + (manquent ? '' : ' disabled') + '>' + k.emoji + ' ' + U.esc(k.nom) +
             ' <small>' + (manquent ? '＋' + manquent : '✓') + '</small></button>';
         }).join('') + '</div>' +
@@ -207,7 +207,7 @@
       if (d.retirer) { var y2 = window.scrollY; S.retirer(d.retirer); rendre(!!b.closest('.suggestions')); window.scrollTo(0, y2); return; }
       if (d.kit) {
         var kit = S.KITS.find(function (k) { return k.id === d.kit; });
-        U.toast(U.pluriel(S.ajouter(kit.ids), 'ingrédient ajouté', 'ingrédients ajoutés'));
+        U.toast(U.pluriel(S.ajouter(S.idsKit(kit)), 'ingrédient ajouté', 'ingrédients ajoutés'));
         rendre();
         return;
       }

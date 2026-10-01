@@ -96,6 +96,12 @@
                 ? '<p>Sur iPhone / iPad : touchez le bouton <b>Partager</b> de Safari puis <b>« Sur l\'écran d\'accueil »</b>.</p>'
                 : '<p>Depuis le menu de votre navigateur, choisissez <b>« Installer l\'application »</b> ou <b>« Ajouter à l\'écran d\'accueil »</b>. Une fois installée, elle fonctionne hors ligne.</p>') +
         '</section>' +
+        '<section class="bloc"><h2>🥛 Intolérance au lactose</h2>' +
+          '<label class="case"><input type="checkbox" data-sans-lactose' + (D.sansLactose() ? ' checked' : '') + '> Je suis intolérant(e) au lactose</label>' +
+          '<p class="aide">Toutes les recettes s\'affichent alors dans leur version sans lactose : lait, crème, yaourts, fromages frais et mozzarella sans lactose, margarine à la place du beurre. ' +
+          'Les fromages affinés (parmesan, comté, emmental, cheddar, camembert…) sont gardés : ils sont naturellement presque sans lactose. Quantités, valeurs nutritionnelles, courses et prix suivent. ' +
+          'Sur chaque recette, vous pouvez toujours revoir la version d\'origine.</p>' +
+        '</section>' +
         '<section class="bloc"><h2>🔄 Version</h2>' +
           '<p>Ma Cuisine <b>version ' + window.App.VERSION + '</b> · prix indicatifs de ' + U.esc(window.PRIX.date) + '.</p>' +
           '<p class="aide">L\'application se met à jour toute seule quand elle est ouverte avec une connexion. Si une nouveauté n\'apparaît pas, touchez ce bouton, ou fermez complètement l\'application puis rouvrez-la.</p>' +
@@ -160,6 +166,14 @@
         setTimeout(function () { location.reload(); }, 700);
       });
       app.querySelector('[data-maj]').addEventListener('click', function () { window.App.verifierMiseAJour(); });
+      app.querySelector('[data-sans-lactose]').addEventListener('change', function (e) {
+        p.sansLactose = e.target.checked;
+        D.profil = Object.assign({}, D.profil || {}, { sansLactose: p.sansLactose });
+        D.sauver('profil');
+        D.rafraichir();
+        majResultats();
+        U.toast(p.sansLactose ? '🥛 Recettes sans lactose activées partout' : 'Recettes d\'origine rétablies');
+      });
       app.querySelector('[data-photos-vider]').addEventListener('click', function () {
         window.PhotosAuto.vider();
         U.toast('Les photos seront recherchées à nouveau');
