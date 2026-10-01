@@ -16,7 +16,9 @@ vm.createContext(contexte);
 const charger = (fichier) => vm.runInContext(fs.readFileSync(path.join(racine, fichier), 'utf8'), contexte, { filename: fichier });
 
 const html = fs.readFileSync(path.join(racine, 'index.html'), 'utf8');
-const scripts = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]).filter((s) => s !== 'js/app.js');
+const tousScripts = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]);
+// Seules les données et le moteur sont chargés ici (pas l'interface).
+const scripts = tousScripts.filter((s) => /^js\/(ingredients|categories|moteur|recettes\/)/.test(s));
 scripts.forEach(charger);
 
 const { INGREDIENTS, RECETTES, Moteur, CATEGORIES } = contexte.window;
@@ -28,12 +30,19 @@ fs.readdirSync(path.join(racine, 'js/recettes')).forEach((f) => {
   if (!scripts.includes('js/recettes/' + f)) erreurs.push(`js/recettes/${f} n'est pas chargé dans index.html`);
 });
 
+// Le service worker doit mettre en cache tous les fichiers de l'application
+const sw = fs.readFileSync(path.join(racine, 'sw.js'), 'utf8');
+const feuilles = [...html.matchAll(/<link rel="stylesheet" href="([^"]+)"/g)].map((m) => m[1]);
+tousScripts.concat(feuilles).forEach((f) => {
+  if (!sw.includes("'" + f + "'")) erreurs.push(`${f} absent de la liste de cache de sw.js`);
+});
+
 Object.entries(INGREDIENTS).forEach(([id, e]) => {
   if (e.length < 7 || e.slice(2, 7).some((v) => typeof v !== 'number')) erreurs.push(`Ingrédient ${id} : valeurs invalides`);
   const [, , kcal, p, g, l, f] = e;
   const calcule = p * 4 + g * 4 + l * 9 + f * 2;
   // Tolérance large : l'alcool, les fibres et les polyols apportent aussi des calories
-  if (kcal > 20 && Math.abs(calcule - kcal) / kcal > 0.3 && !['vin_rouge', 'vin_blanc', 'biere'].includes(id)) {
+  if (kcal > 20 && Math.abs(calcule - kcal) / kcal > 0.3 && !['vin_rouge', 'vin_blanc', 'biere', 'cidre', 'mirin', 'alcool_fort'].includes(id)) {
     avertissements.push(`Ingrédient ${id} : ${kcal} kcal annoncées vs ${Math.round(calcule)} calculées depuis les macros`);
   }
 });
@@ -65,6 +74,32 @@ RECETTES.forEach((r) => {
   if (n.kcal < 30 || n.kcal > 1300) avertissements.push(`${ref} : ${Math.round(n.kcal)} kcal par portion, à vérifier`);
   lignes.push([r.id, r.cat, Math.round(n.kcal), Math.round(n.p), Math.round(n.g), Math.round(n.l)]);
 });
+
+// ---------- Doublons ----------
+// Clé = mots significatifs du nom (sans accents, pluriels, mots vides, ordre).
+const MOTS_VIDES = new Set(['de', 'du', 'des', 'la', 'le', 'les', 'l', 'd', 'au', 'aux', 'a', 'et', 'en', 'sur', 'avec', 'sauce',
+  'facon', 'maison', 'mon', 'ma', 'mes', 'un', 'une', 'the', 'al', 'alla', 'all', 'el', 'con', 'di', 'ou']);
+const mots = (nom) => [...new Set(nom.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/œ/g, 'oe')
+  .replace(/\([^)]*\)/g, ' ').split(/[^a-z0-9]+/).filter((m) => m && !MOTS_VIDES.has(m)).map((m) => m.replace(/(s|x)$/, '')))].sort();
+// Paires proches mais bien distinctes (vérifiées à la main)
+const AUTORISES = new Set((require('./doublons-autorises.json') || []).map((p) => p.slice().sort().join(' | ')));
+const parCle = {};
+RECETTES.forEach((r) => {
+  const cle = mots(r.nom).join(' ');
+  if (parCle[cle]) erreurs.push(`Doublon : « ${r.nom} » et « ${parCle[cle]} »`);
+  else parCle[cle] = r.nom;
+});
+for (let i = 0; i < RECETTES.length; i++) {
+  const a = mots(RECETTES[i].nom);
+  for (let j = i + 1; j < RECETTES.length; j++) {
+    const b = mots(RECETTES[j].nom);
+    const communs = a.filter((m) => b.includes(m)).length;
+    const union = new Set(a.concat(b)).size;
+    if (communs >= 2 && communs / union >= 0.6 && !AUTORISES.has([RECETTES[i].nom, RECETTES[j].nom].sort().join(' | '))) {
+      avertissements.push(`Noms proches : « ${RECETTES[i].nom} » / « ${RECETTES[j].nom} »`);
+    }
+  }
+}
 
 if (process.argv.includes('--tableau')) {
   console.log('id'.padEnd(34), 'catégorie'.padEnd(20), 'kcal', '   P', '   G', '   L');

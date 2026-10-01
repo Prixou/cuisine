@@ -149,12 +149,35 @@
     return { qte: qte, nom: nom };
   }
 
+  /* Quantité cumulée pour la liste de courses : parts = { pc, g, ml, cc } (cc = cuillères à café). */
+  function afficherParties(id, parts) {
+    var ing = infos(id) || { nom: id };
+    var morceaux = [];
+    var nom = ing.nom;
+    if (parts.pc > 0) {
+      var n = arrondirPieces(parts.pc, ing.pc || 0);
+      var t = fraction(n);
+      if (ing.u) t += ' ' + (n > 1 ? ing.u[1] : ing.u[0]);
+      else if (n > 1 && ing.pl) nom = ing.pl;
+      morceaux.push(t);
+    }
+    if (parts.g > 0) morceaux.push(masse(parts.g, 'g', 'kg'));
+    if (parts.ml > 0) morceaux.push(masse(parts.ml, 'ml', 'L'));
+    if (parts.cc > 0) {
+      morceaux.push(parts.cc >= 3
+        ? fraction(arrondirCuilleres(parts.cc / 3)) + ' c. à soupe'
+        : fraction(arrondirCuilleres(parts.cc)) + ' c. à café');
+    }
+    return { qte: morceaux.join(' + '), nom: nom };
+  }
+
   global.Moteur = {
     infos: infos,
     versGrammes: versGrammes,
     analyser: analyser,
     repartition: repartition,
     afficherLigne: afficherLigne,
+    afficherParties: afficherParties,
     nombre: nombre,
     UNITES: ['g', 'kg', 'ml', 'cl', 'l', 'pc', 'cs', 'cc', 'pincee', 'qs']
   };

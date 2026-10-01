@@ -1,0 +1,23 @@
+{
+  "name": "Ma Cuisine",
+  "short_name": "Ma Cuisine",
+  "description": "Recettes avec portions ajustables, calories et macros, planning des repas, liste de courses et mode frigo.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#faf6f1",
+  "theme_color": "#b9441a",
+  "categories": ["food", "health", "lifestyle"],
+  "icons": [
+    { "src": "icones/icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icones/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icones/icone-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Liste de courses", "url": "./#/courses" },
+    { "name": "Planning", "url": "./#/planning" },
+    { "name": "Mon frigo", "url": "./#/frigo" }
+  ]
+}

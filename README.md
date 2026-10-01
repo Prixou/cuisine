@@ -1,45 +1,58 @@
 # 🍳 Ma Cuisine
 
-Application web de recettes : **196 plats** du monde entier, quantités ajustables au nombre de portions, **calories et macros** (protéines, glucides, lipides, fibres) calculées pour chaque recette.
+Application web de cuisine : **500 recettes** du monde entier, quantités ajustables au nombre de portions, **calories et macros** pour chaque plat, planning des repas, liste de courses, mode frigo, objectifs nutritionnels et recettes personnelles. Elle s'installe sur le téléphone et fonctionne hors ligne.
 
 ## Utilisation
 
-Aucune installation : ouvrez `index.html` dans un navigateur (ordinateur ou téléphone).
-Pour y accéder partout, activez GitHub Pages sur le dépôt (Settings → Pages → branche `main`, dossier `/`).
+- **En local** : ouvrez `index.html` dans un navigateur. Tout fonctionne, sauf l'installation et le hors-ligne, qui exigent une adresse http(s).
+- **En ligne (recommandé)** : activez GitHub Pages (Settings → Pages → branche `main`, dossier `/`). Ouvrez ensuite l'adresse sur votre téléphone puis « Ajouter à l'écran d'accueil ».
 
-## Fonctionnalités (V1)
+## Fonctionnalités
 
-- **196 recettes** réparties en 13 catégories (entrées, soupes, apéro, viandes, volailles, poissons, végétarien, pâtes & riz, tartes & pizzas, burgers, accompagnements, petit-déjeuner, desserts) et plus de 35 cuisines.
-- **Portions ajustables** : toutes les quantités sont recalculées et arrondies intelligemment (fractions ½ ¼, passage en kg / L, cuillères, gousses, tranches…).
-- **Valeurs nutritionnelles** par portion et au total : kcal, protéines, glucides, lipides, fibres, et répartition des calories.
-- **Recherche** par nom ou par ingrédient (« poulet coco », « feta »…).
-- **Filtres** : catégorie, cuisine, temps total, végétarien, vegan, sans gluten, riche en protéines, léger (< 400 kcal). **Tri** par calories, protéines, temps.
-- **Favoris** et portions choisies mémorisés sur l'appareil.
-- **En cuisine** : on coche les ingrédients et les étapes réalisées. Le « mode cuisine » empêche l'écran de se mettre en veille.
-- Thème clair / sombre automatique, adapté au mobile.
+| | |
+|---|---|
+| 📖 **Recettes** | 500 recettes, 14 catégories, plus de 60 cuisines. Recherche par nom ou ingrédient. Filtres par cuisine, temps, régime (végétarien, vegan, sans gluten), riche en protéines, léger. Tri par calories, protéines, temps, mes notes ou « adapté à mes objectifs ». |
+| ⚖️ **Portions** | Toutes les quantités sont recalculées et arrondies intelligemment (½, ¼, kg, L, cuillères, gousses, tranches…). |
+| 🔥 **Macros** | kcal, protéines, glucides, lipides, fibres par portion et au total, répartition des calories, part de vos besoins du jour. |
+| 🛒 **Liste de courses** | Ajout d'une recette (ou de toute la semaine du planning) avec ses portions. Les ingrédients sont additionnés et rangés par rayon. Articles libres, cases à cocher, partage / copie. |
+| 📅 **Planning** | Repas de la semaine (petit-déjeuner, déjeuner, dîner, collation), totaux journaliers face aux objectifs, **génération automatique** des repas selon vos calories et macros. |
+| 🎯 **Objectifs** | Calcul des besoins (formule de Mifflin-St Jeor, niveau d'activité, perte / maintien / prise de muscle) ou saisie manuelle, régime préféré, suggestions de plats et de petits-déjeuners adaptés. |
+| 🧊 **Mode frigo** | Indiquez vos ingrédients : les recettes réalisables apparaissent d'abord, avec les ingrédients manquants. Les ingrédients équivalents sont pris en compte (les différents riz, les crèmes, etc.). |
+| ✏️ **Mes recettes** | Créez vos recettes avec calcul automatique des macros, ajoutez vos propres ingrédients (valeurs de l'étiquette), ou « adaptez à votre façon » une recette existante. |
+| ⏱ **Minuteurs** | Les durées des étapes (« 10 min », « 1 h 30 ») deviennent des boutons. Plusieurs minuteurs en parallèle, alarme sonore, vibration et notification. |
+| 📷 **Notes & photos** | Note de 1 à 5 étoiles, remarques personnelles et photo de votre plat sur chaque recette. |
+| 📱 **Application** | Installable (PWA), hors ligne, mode « cuisine » qui garde l'écran allumé, thème sombre automatique. |
+| 💾 **Sauvegarde** | Vos données restent sur l'appareil. Elles s'exportent et s'importent en un fichier pour changer de téléphone. |
 
-## Comment sont calculées les macros ?
+## Calcul des macros
 
-Chaque ingrédient possède ses valeurs pour 100 g (d'après les tables **CIQUAL** (Anses) et **USDA**, arrondies) dans `js/ingredients.js`.
-Les recettes listent leurs ingrédients en grammes, ml, pièces ou cuillères. Le moteur (`js/moteur.js`) convertit tout en grammes (poids moyen à la pièce, densité) et additionne.
-Les valeurs sont donc cohérentes quelle que soit la quantité, mais restent **indicatives** : ingrédients crus, hors ingrédients « selon goût », et l'huile de friture est estimée à la part absorbée.
+Chaque ingrédient a ses valeurs pour 100 g dans `js/ingredients.js` (≈ 310 ingrédients, d'après les tables **CIQUAL** (Anses) et **USDA**, arrondies).
+Les recettes indiquent leurs ingrédients en g, ml, pièces ou cuillères. Le moteur (`js/moteur.js`) convertit tout en grammes (poids moyen d'une pièce, densité) puis additionne.
+Les valeurs sont **indicatives** : elles portent sur les ingrédients crus, sans les ingrédients « selon goût », et l'huile de friture est comptée pour la seule part absorbée.
 
 ## Structure
 
 ```
-index.html                 page unique
-css/style.css              styles (thème clair/sombre)
-js/ingredients.js          base nutritionnelle (~260 ingrédients)
-js/categories.js           catégories
-js/moteur.js               conversions, calculs nutritionnels, arrondis
-js/recettes/*.js           les recettes
-js/app.js                  interface (liste, filtres, fiche recette)
-tools/valider.js           vérification des données
+index.html                  page unique
+manifest.webmanifest, sw.js application installable et hors ligne
+icones/                     icônes de l'application
+css/style.css               styles (thème clair / sombre)
+js/outils.js                stockage, texte, dates, fenêtres, images
+js/ingredients.js           base nutritionnelle
+js/categories.js            catégories
+js/moteur.js                conversions, calculs nutritionnels, arrondis
+js/recettes/*.js            les 500 recettes
+js/donnees.js               données perso, objectifs, planning, courses, photos
+js/minuteurs.js             minuteurs de cuisine
+js/vues/*.js                écrans (liste, fiche, courses, planning, frigo, objectifs, éditeur)
+js/app.js                   navigation
+tools/valider.js            vérification des données (dont les doublons)
+tools/ajouter-fichier.py    déclare un nouveau fichier de recettes
 ```
 
-## Ajouter une recette
+## Ajouter des recettes au catalogue
 
-Ajoutez un objet dans un fichier de `js/recettes/` :
+Ajoutez un objet dans un fichier de `js/recettes/` (ou créez un fichier, puis lancez `python3 tools/ajouter-fichier.py js/recettes/mon-fichier.js`) :
 
 ```js
 {
@@ -53,15 +66,18 @@ Ajoutez un objet dans un fichier de `js/recettes/` :
     ['pates', 400, 'g', 'Spaghetti'],                   // libellé personnalisé
     ['sel', 0, 'qs']                                    // selon goût
   ],
-  etapes: ['Étape 1…', 'Étape 2…'],
+  etapes: ['Étape 1…', 'Faites cuire 10 min.'],          // « 10 min » devient un minuteur
   astuce: 'Facultatif.'
 }
 ```
 
 Unités : `g`, `kg`, `ml`, `cl`, `l`, `pc` (pièce), `cs` (c. à soupe), `cc` (c. à café), `pincee`, `qs` (selon goût).
-Si un ingrédient manque, ajoutez-le dans `js/ingredients.js`. Lancez ensuite la vérification :
+
+Ensuite, lancez la vérification :
 
 ```
-node tools/valider.js            # erreurs et valeurs suspectes
+node tools/valider.js            # ingrédients inconnus, unités, doublons, valeurs suspectes
 node tools/valider.js --tableau  # tableau kcal / macros de toutes les recettes
 ```
+
+La détection des doublons compare les noms normalisés (sans accents, pluriels, mots vides ni ordre des mots) et signale les noms très proches. Les paires proches mais bien distinctes se déclarent dans `tools/doublons-autorises.json`.
