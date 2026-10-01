@@ -14,6 +14,9 @@
     if (r.nutrition.regimes.vegan) b.push('<span class="badge badge-vege">Vegan</span>');
     else if (r.nutrition.regimes.vegetarien) b.push('<span class="badge badge-vege">Végé</span>');
     if (r.proteine) b.push('<span class="badge badge-proteine">Protéiné</span>');
+    var c = window.BATCH.conservation(r.id);
+    if (c && c.congel) b.push('<span class="badge badge-batch" title="Se congèle ' + c.congel + ' mois">❄️ Batch</span>');
+    else if (c) b.push('<span class="badge badge-batch" title="Se garde ' + c.frigo + ' jours">Batch</span>');
     return b.join('');
   };
 
@@ -21,9 +24,14 @@
     return n ? '<span class="etoiles" aria-label="' + n + ' étoiles sur 5">' + '★★★★★'.slice(0, n) + '<span>' + '★★★★★'.slice(n) + '</span></span>' : '';
   };
 
+  /* Ma photo d'abord, sinon la photo Wikimedia (cherchée quand la carte devient visible), sinon l'emoji. */
   C.visuel = function (r) {
     var photo = D.photos.url(r.id);
-    return photo ? '<img src="' + photo + '" alt="" loading="lazy">' : '<span>' + U.esc(r.emoji || '🍽️') + '</span>';
+    if (photo) return '<img src="' + photo + '" alt="" loading="lazy">';
+    var auto = window.PhotosAuto.connue(r.id);
+    if (auto) return window.PhotosAuto.balise(auto, '', r.emoji);
+    var attente = window.PhotosAuto.actif() && !r.perso ? ' data-photo-auto="' + U.esc(r.id) + '"' : '';
+    return '<span' + attente + '>' + U.esc(r.emoji || '🍽️') + '</span>';
   };
 
   C.carte = function (r, supplement) {
