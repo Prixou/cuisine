@@ -16,6 +16,7 @@ Application web de cuisine : **569 recettes** du monde entier, dont des recettes
 | ⚖️ **Portions** | Toutes les quantités sont recalculées et arrondies intelligemment (½, ¼, kg, L, cuillères, gousses, tranches…). |
 | 🔥 **Macros** | kcal, protéines, glucides, lipides, fibres par portion et au total, répartition des calories, part de vos besoins du jour. |
 | 🛒 **Liste de courses** | Ajout d'une recette (ou de toute la semaine du planning) avec ses portions. Les ingrédients sont additionnés et rangés par rayon. Articles libres, cases à cocher, partage / copie. |
+| 💶 **Prix Lidl / E.Leclerc** | Prix de la liste de courses dans les deux magasins, avec le moins cher mis en avant. Le calcul compte des paquets entiers en caisse (une plaquette de 250 g, une boîte de 12 œufs) et les fruits, légumes et viandes au poids. Il donne aussi la part réellement utilisée par les recettes et ce qui est déjà dans le caddie. Chaque article affiche son prix et son conditionnement : touchez-le pour corriger le prix ou le paquet selon votre magasin. Le coût par portion apparaît sur chaque recette et chaque carte, avec un tri « moins chère par portion » et le coût des sessions de batch cooking. |
 | 📅 **Planning** | Repas de la semaine (petit-déjeuner, déjeuner, dîner, collation), totaux journaliers face aux objectifs, **génération automatique** des repas selon vos calories et macros. |
 | 🎯 **Objectifs** | Calcul des besoins (formule de Mifflin-St Jeor, niveau d'activité, perte / maintien / prise de muscle) ou saisie manuelle, régime préféré, suggestions de plats et de petits-déjeuners adaptés. |
 | 🏠 **Chez moi** | Listez tout ce que vous avez à la maison, rangé par endroit (frigo, fruits et légumes, placard, condiments, épices), avec des kits pour le remplir en un geste. Les quantités sont facultatives. L'application montre les recettes **faisables sans rien acheter**, celles qui utilisent le plus vos produits frais d'abord (anti-gaspi), puis celles où il manque 1 ou 2 ingrédients. Filtres par type et par temps. Le nombre de personnes est vérifié si vous avez donné les quantités. Les ingrédients équivalents comptent (les riz, les crèmes, etc.). Sur chaque recette : 🏠 devant ce que vous avez, « ajouter seulement ce qui manque aux courses » et « je l'ai cuisinée », qui met le stock à jour. Dans la liste de courses, ce que vous avez déjà est mis de côté, et les articles achetés se rangent dans le stock en une touche. |
@@ -46,6 +47,8 @@ js/moteur.js                conversions, calculs nutritionnels, arrondis
 js/recettes/*.js            les 569 recettes
 js/photos-recettes.js       où chercher la photo de chaque recette (Wikipédia, Commons)
 js/stock.js                 mon stock : ingrédients chez moi, quantités, recettes faisables
+js/prix.js                  prix indicatifs Lidl et E.Leclerc par conditionnement
+js/budget.js                coût des courses et des recettes
 js/batch.js                 batch cooking : conservation, réchauffage, sessions
 js/donnees.js               données perso, objectifs, planning, courses, photos
 js/photos-auto.js           recherche des photos sur Wikimedia, cache, crédits
@@ -91,3 +94,10 @@ node tools/valider.js --tableau  # tableau kcal / macros de toutes les recettes
 ```
 
 La détection des doublons compare les noms normalisés (sans accents, pluriels, mots vides ni ordre des mots) et signale les noms très proches. Les paires proches mais bien distinctes se déclarent dans `tools/doublons-autorises.json`.
+
+## Prix
+
+`js/prix.js` donne pour chaque ingrédient le prix d'un conditionnement courant chez Lidl et chez E.Leclerc, en marque de distributeur et hors promotions : `id: [prix Lidl, prix Leclerc, quantité, unité, conditionnement]`. L'unité `kg` veut dire vendu au poids. `null` veut dire que le produit est rarement vendu dans cette enseigne : le prix de l'autre est alors utilisé, avec la marque ≈.
+
+Ces prix sont **indicatifs**. Ils sont calés sur des relevés publics de 2026 et sur les comparatifs d'enseignes, car Lidl et E.Leclerc ne publient pas d'API de prix. Ils varient selon le magasin, la saison et les promotions. Pensez à les mettre à jour de temps en temps (la date est en tête du fichier) ; chacun peut aussi corriger ses prix dans l'application.
+

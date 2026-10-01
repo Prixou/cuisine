@@ -16,7 +16,8 @@
     profil: null,
     mesRecettes: [],
     mesIngredients: {},
-    frigo: { ingredients: [], basiques: true, quantites: {} }
+    frigo: { ingredients: [], basiques: true, quantites: {} },
+    prix: { magasin: 'lidl', perso: {} }                 // magasin préféré, mes prix corrigés
   };
   Object.keys(DEFAUTS).forEach(function (cle) {
     D[cle] = U.lire('cuisine.' + cle, JSON.parse(JSON.stringify(DEFAUTS[cle])));

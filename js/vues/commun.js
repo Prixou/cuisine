@@ -37,13 +37,14 @@
   C.carte = function (r, supplement) {
     var n = r.nutrition.parPortion;
     var note = D.notes[r.id] && D.notes[r.id].etoiles;
+    var cout = window.Budget.coutRecette(r).parPortion;
     return '<a class="carte" href="#/recette/' + encodeURIComponent(r.id) + '">' +
       '<div class="carte-visuel" aria-hidden="true">' + C.visuel(r) +
         (D.estFavori(r.id) ? '<span class="carte-coeur">♥</span>' : '') + '</div>' +
       '<div class="carte-corps">' +
         '<div class="carte-badges">' + C.badges(r) + '</div>' +
         '<h3>' + U.esc(r.nom) + '</h3>' +
-        '<p class="carte-meta">⏱ ' + U.duree(r.temps) + ' · ' + U.esc(r.cuisine) + (note ? ' · ' + C.etoiles(note) : '') + '</p>' +
+        '<p class="carte-meta">⏱ ' + U.duree(r.temps) + ' · ' + U.esc(r.cuisine) + (cout > 0 ? ' · ' + window.Budget.euros(cout) : '') + (note ? ' · ' + C.etoiles(note) : '') + '</p>' +
         (supplement || '') +
         '<div class="carte-nutri">' +
           '<strong>' + U.r(n.kcal) + ' kcal</strong>' +

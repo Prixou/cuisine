@@ -15,6 +15,7 @@
     kcalDesc: { nom: 'Calories ↓', f: function (a, b) { return b.nutrition.parPortion.kcal - a.nutrition.parPortion.kcal; } },
     proteines: { nom: 'Protéines ↓', f: function (a, b) { return b.nutrition.parPortion.p - a.nutrition.parPortion.p; } },
     temps: { nom: 'Plus rapide', f: function (a, b) { return a.temps - b.temps; } },
+    prix: { nom: 'Moins chère par portion', f: function (a, b) { return window.Budget.coutRecette(a).parPortion - window.Budget.coutRecette(b).parPortion; } },
     notes: { nom: 'Mes meilleures notes', f: function (a, b) { return note(b) - note(a) || a.nom.localeCompare(b.nom, 'fr'); } }
   };
 
