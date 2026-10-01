@@ -11,6 +11,7 @@ window.CATEGORIES = [
   { nom: 'Tartes & pizzas', emoji: '🍕' },
   { nom: 'Burgers & sandwichs', emoji: '🍔' },
   { nom: 'Accompagnements', emoji: '🥔' },
+  { nom: 'Sauces & bases', emoji: '🥫' },
   { nom: 'Petit-déjeuner', emoji: '🥞' },
   { nom: 'Desserts', emoji: '🍰' }
 ];
