@@ -16,7 +16,7 @@
     profil: null,
     mesRecettes: [],
     mesIngredients: {},
-    frigo: { ingredients: [], basiques: true }
+    frigo: { ingredients: [], basiques: true, quantites: {} }
   };
   Object.keys(DEFAUTS).forEach(function (cle) {
     D[cle] = U.lire('cuisine.' + cle, JSON.parse(JSON.stringify(DEFAUTS[cle])));
@@ -263,7 +263,7 @@
         .filter(function (a) { return groupe.rayons.indexOf(a.rayon) !== -1; })
         .map(function (a) {
           var aff = M.afficherParties(a.id, a.parts);
-          return { cle: a.id, nom: aff.nom, qte: aff.qte || 'selon besoin', recettes: a.recettes };
+          return { cle: a.id, nom: aff.nom, qte: aff.qte || 'selon besoin', recettes: a.recettes, parts: a.parts };
         })
         .sort(function (x, y) { return x.nom.localeCompare(y.nom, 'fr'); });
       return { nom: groupe.nom, emoji: groupe.emoji, articles: articles };

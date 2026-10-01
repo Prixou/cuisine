@@ -8,7 +8,7 @@
   var NAV = [
     { route: '', emoji: '📖', nom: 'Recettes' },
     { route: 'batch', emoji: '🍱', nom: 'Batch' },
-    { route: 'frigo', emoji: '🧊', nom: 'Frigo' },
+    { route: 'frigo', emoji: '🏠', nom: 'Chez moi' },
     { route: 'planning', emoji: '📅', nom: 'Planning' },
     { route: 'courses', emoji: '🛒', nom: 'Courses' },
     { route: 'profil', emoji: '🎯', nom: 'Objectifs' }
