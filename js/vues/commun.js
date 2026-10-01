@@ -21,9 +21,14 @@
     return n ? '<span class="etoiles" aria-label="' + n + ' étoiles sur 5">' + '★★★★★'.slice(0, n) + '<span>' + '★★★★★'.slice(n) + '</span></span>' : '';
   };
 
+  /* Ma photo d'abord, sinon la photo Wikimedia (cherchée quand la carte devient visible), sinon l'emoji. */
   C.visuel = function (r) {
     var photo = D.photos.url(r.id);
-    return photo ? '<img src="' + photo + '" alt="" loading="lazy">' : '<span>' + U.esc(r.emoji || '🍽️') + '</span>';
+    if (photo) return '<img src="' + photo + '" alt="" loading="lazy">';
+    var auto = window.PhotosAuto.connue(r.id);
+    if (auto) return window.PhotosAuto.balise(auto, '', r.emoji);
+    var attente = window.PhotosAuto.actif() && !r.perso ? ' data-photo-auto="' + U.esc(r.id) + '"' : '';
+    return '<span' + attente + '>' + U.esc(r.emoji || '🍽️') + '</span>';
   };
 
   C.carte = function (r, supplement) {

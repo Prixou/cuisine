@@ -96,6 +96,14 @@
                 ? '<p>Sur iPhone / iPad : touchez le bouton <b>Partager</b> de Safari puis <b>« Sur l\'écran d\'accueil »</b>.</p>'
                 : '<p>Depuis le menu de votre navigateur, choisissez <b>« Installer l\'application »</b> ou <b>« Ajouter à l\'écran d\'accueil »</b>. Une fois installée, elle fonctionne hors ligne.</p>') +
         '</section>' +
+        '<section class="bloc"><h2>📷 Photos des recettes</h2>' +
+          '<label class="case"><input type="checkbox" data-photos-auto' + (window.PhotosAuto.actif() ? ' checked' : '') + '> Afficher automatiquement une photo de chaque plat</label>' +
+          '<p class="aide">Les photos sont des images libres de droits de <a href="https://commons.wikimedia.org" target="_blank" rel="noopener">Wikimedia Commons</a> (la photothèque de Wikipédia), ' +
+          'chargées la première fois qu\'une recette s\'affiche puis gardées pour le hors-ligne. L\'auteur et la licence de chaque photo sont indiqués sur la fiche. ' +
+          'Si une photo ne correspond pas, touchez « Pas la bonne photo ? » sous l\'image. Votre propre photo est toujours prioritaire.</p>' +
+          '<p class="aide">' + U.pluriel(window.PhotosAuto.nombre(), 'photo déjà trouvée', 'photos déjà trouvées') + '.</p>' +
+          '<div class="actions-bas"><button class="bouton" data-photos-vider>↺ Rechercher à nouveau toutes les photos</button></div>' +
+        '</section>' +
         '<section class="bloc"><h2>💾 Mes données</h2>' +
           '<p class="aide">Favoris, notes, planning, courses, objectifs et recettes perso sont enregistrés uniquement sur cet appareil. Sauvegardez-les pour les transférer sur un autre appareil (les photos ne sont pas incluses).</p>' +
           '<div class="actions-bas">' +
@@ -141,6 +149,16 @@
         ev.prompt();
         ev.userChoice.finally(function () { window.App.installation = null; rendre(); });
       });
+      app.querySelector('[data-photos-auto]').addEventListener('change', function (e) {
+        window.PhotosAuto.activer(e.target.checked);
+        U.toast(e.target.checked ? 'Photos activées' : 'Photos désactivées : les emojis sont affichés');
+        setTimeout(function () { location.reload(); }, 700);
+      });
+      app.querySelector('[data-photos-vider]').addEventListener('click', function () {
+        window.PhotosAuto.vider();
+        U.toast('Les photos seront recherchées à nouveau');
+        rendre();
+      });
       app.querySelector('[data-exporter]').addEventListener('click', function () {
         U.telecharger('ma-cuisine-' + U.iso(new Date()) + '.json', D.exporter());
       });
@@ -155,6 +173,7 @@
       });
       app.querySelector('[data-effacer]').addEventListener('click', function () {
         U.confirmer('Effacer toutes vos données (favoris, notes, planning, courses, recettes perso, photos) ? Cette action est irréversible.', 'Tout effacer', function () {
+          window.PhotosAuto.vider();
           D.toutEffacer();
           location.hash = '#/';
           location.reload();

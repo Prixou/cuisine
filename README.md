@@ -20,7 +20,8 @@ Application web de cuisine : **500 recettes** du monde entier, quantités ajusta
 | 🧊 **Mode frigo** | Indiquez vos ingrédients : les recettes réalisables apparaissent d'abord, avec les ingrédients manquants. Les ingrédients équivalents sont pris en compte (les différents riz, les crèmes, etc.). |
 | ✏️ **Mes recettes** | Créez vos recettes avec calcul automatique des macros, ajoutez vos propres ingrédients (valeurs de l'étiquette), ou « adaptez à votre façon » une recette existante. |
 | ⏱ **Minuteurs** | Les durées des étapes (« 10 min », « 1 h 30 ») deviennent des boutons. Plusieurs minuteurs en parallèle, alarme sonore, vibration et notification. |
-| 📷 **Notes & photos** | Note de 1 à 5 étoiles, remarques personnelles et photo de votre plat sur chaque recette. |
+| 🖼️ **Photos des plats** | Chaque recette affiche une vraie photo libre de droits de Wikimedia Commons, avec son auteur et sa licence. Elle est cherchée à l'affichage, puis gardée pour le hors-ligne. « Pas la bonne photo ? » passe à la suivante. Désactivable dans Objectifs. |
+| 📷 **Notes & photos perso** | Note de 1 à 5 étoiles, remarques personnelles et photo de votre plat (prioritaire sur la photo Wikimedia). |
 | 📱 **Application** | Installable (PWA), hors ligne, mode « cuisine » qui garde l'écran allumé, thème sombre automatique. |
 | 💾 **Sauvegarde** | Vos données restent sur l'appareil. Elles s'exportent et s'importent en un fichier pour changer de téléphone. |
 
@@ -42,7 +43,9 @@ js/ingredients.js           base nutritionnelle
 js/categories.js            catégories
 js/moteur.js                conversions, calculs nutritionnels, arrondis
 js/recettes/*.js            les 500 recettes
+js/photos-recettes.js       où chercher la photo de chaque recette (Wikipédia, Commons)
 js/donnees.js               données perso, objectifs, planning, courses, photos
+js/photos-auto.js           recherche des photos sur Wikimedia, cache, crédits
 js/minuteurs.js             minuteurs de cuisine
 js/vues/*.js                écrans (liste, fiche, courses, planning, frigo, objectifs, éditeur)
 js/app.js                   navigation
@@ -70,6 +73,8 @@ Ajoutez un objet dans un fichier de `js/recettes/` (ou créez un fichier, puis l
   astuce: 'Facultatif.'
 }
 ```
+
+Ajoutez aussi la source de sa photo dans `js/photos-recettes.js` : `'mon-plat': 'w:Titre de l\'article Wikipédia|c:recherche en anglais'`. Les candidats sont essayés dans l'ordre : `w:` prend l'image principale de l'article Wikipédia en français, `c:` cherche des photos sur Wikimedia Commons.
 
 Unités : `g`, `kg`, `ml`, `cl`, `l`, `pc` (pièce), `cs` (c. à soupe), `cc` (c. à café), `pincee`, `qs` (selon goût).
 

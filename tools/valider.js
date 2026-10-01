@@ -18,10 +18,10 @@ const charger = (fichier) => vm.runInContext(fs.readFileSync(path.join(racine, f
 const html = fs.readFileSync(path.join(racine, 'index.html'), 'utf8');
 const tousScripts = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]);
 // Seules les données et le moteur sont chargés ici (pas l'interface).
-const scripts = tousScripts.filter((s) => /^js\/(ingredients|categories|moteur|recettes\/)/.test(s));
+const scripts = tousScripts.filter((s) => /^js\/(ingredients|categories|moteur|photos-recettes|recettes\/)/.test(s));
 scripts.forEach(charger);
 
-const { INGREDIENTS, RECETTES, Moteur, CATEGORIES } = contexte.window;
+const { INGREDIENTS, RECETTES, Moteur, CATEGORIES, PHOTOS_RECETTES } = contexte.window;
 const erreurs = [];
 const avertissements = [];
 
@@ -74,6 +74,16 @@ RECETTES.forEach((r) => {
   if (n.kcal < 30 || n.kcal > 1300) avertissements.push(`${ref} : ${Math.round(n.kcal)} kcal par portion, à vérifier`);
   lignes.push([r.id, r.cat, Math.round(n.kcal), Math.round(n.p), Math.round(n.g), Math.round(n.l)]);
 });
+
+// ---------- Photos ----------
+if (PHOTOS_RECETTES) {
+  const idsRecettes = new Set(RECETTES.map((r) => r.id));
+  RECETTES.forEach((r) => { if (!PHOTOS_RECETTES[r.id]) avertissements.push(`${r.id} : aucune source de photo dans js/photos-recettes.js`); });
+  Object.entries(PHOTOS_RECETTES).forEach(([id, sources]) => {
+    if (!idsRecettes.has(id)) erreurs.push(`photos-recettes.js : recette inconnue "${id}"`);
+    sources.split('|').forEach((c) => { if (!/^[wc]:\S/.test(c)) erreurs.push(`photos-recettes.js : source invalide "${c}" pour ${id}`); });
+  });
+}
 
 // ---------- Doublons ----------
 // Clé = mots significatifs du nom (sans accents, pluriels, mots vides, ordre).

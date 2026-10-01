@@ -339,7 +339,7 @@
     });
   };
   D.toutEffacer = function () {
-    Object.keys(DEFAUTS).concat(['minuteurs']).forEach(function (cle) {
+    Object.keys(DEFAUTS).concat(['minuteurs', 'photosAuto', 'reglages']).forEach(function (cle) {
       try { localStorage.removeItem('cuisine.' + cle); } catch (e) { /* ignoré */ }
     });
     try { indexedDB.deleteDatabase('cuisine'); } catch (e) { /* ignoré */ }

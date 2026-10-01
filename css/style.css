@@ -404,7 +404,9 @@ textarea.champ { resize: vertical; line-height: 1.45; }
   background: radial-gradient(circle at 30% 20%, var(--accent-doux), var(--surface-2));
 }
 
-.carte-visuel img { width: 100%; height: 100%; object-fit: cover; }
+.carte-visuel { overflow: hidden; }
+
+.carte-visuel img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
 .carte-coeur {
   position: absolute;
@@ -496,7 +498,21 @@ i[class^="pt-"] { display: inline-block; width: 8px; height: 8px; border-radius:
   background: radial-gradient(circle at 30% 20%, var(--accent-doux), var(--surface-2));
 }
 
-.fiche-photo { flex: none; width: 220px; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 16px; box-shadow: var(--ombre); }
+.fiche-visuel { flex: none; width: 220px; }
+
+.fiche-visuel:has(.fiche-emoji) { width: auto; }
+
+.fiche-photo { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 16px; box-shadow: var(--ombre); background: var(--surface-2); }
+
+.credit-photo { margin: 6px 2px 0; font-size: .72rem; line-height: 1.4; color: var(--texte-2); overflow-wrap: anywhere; }
+
+.credit-photo a { color: inherit; }
+
+.credit-photo .lien { font-size: .75rem; margin-top: 2px; }
+
+.carte-visuel img, .fiche-photo { animation: apparaitre .35s ease; }
+
+@keyframes apparaitre { from { opacity: 0; } to { opacity: 1; } }
 
 .fiche-cat { margin: 0; color: var(--accent); font-weight: 700; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; }
 
@@ -511,7 +527,8 @@ i[class^="pt-"] { display: inline-block; width: 8px; height: 8px; border-radius:
 @media (max-width: 600px) {
   .fiche-entete { flex-direction: column; gap: 10px; }
   .fiche-emoji { width: 64px; height: 64px; font-size: 2.4rem; border-radius: 16px; }
-  .fiche-photo { width: 100%; }
+  .fiche-visuel { width: 100%; }
+  .fiche-visuel:has(.fiche-emoji) { width: auto; }
 }
 
 .actions-principales { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }

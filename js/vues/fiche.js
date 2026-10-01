@@ -36,8 +36,8 @@
             '<button class="bouton-pilule" data-favori></button>' +
           '</div>' +
         '</div>' +
-        '<header class="fiche-entete' + (photo ? ' avec-photo' : '') + '">' +
-          (photo ? '<img class="fiche-photo" src="' + photo + '" alt="Photo de ' + U.esc(r.nom) + '">' : '<div class="fiche-emoji" aria-hidden="true">' + U.esc(r.emoji) + '</div>') +
+        '<header class="fiche-entete">' +
+          '<div class="fiche-visuel" data-fiche-visuel></div>' +
           '<div>' +
             '<p class="fiche-cat">' + U.esc(r.cat) + ' · ' + U.esc(r.cuisine) + (r.perso ? ' · Ma recette' : '') + '</p>' +
             '<h1>' + U.esc(r.nom) + '</h1>' +
@@ -112,6 +112,41 @@
       '</article>';
 
     var $ = function (s) { return app.querySelector(s); };
+
+    // Visuel : ma photo, sinon photo Wikimedia (avec crédit obligatoire), sinon emoji.
+    var PA = window.PhotosAuto;
+    function rendreVisuel(auto) {
+      var zone = $('[data-fiche-visuel]');
+      if (!zone) return;
+      var html;
+      if (photo) {
+        html = '<img class="fiche-photo" src="' + photo + '" alt="Ma photo de ' + U.esc(r.nom) + '">';
+      } else if (auto) {
+        html = PA.balise(auto, 'Photo : ' + r.nom, r.emoji, 'fiche-photo') +
+          '<p class="credit-photo">📷 ' + (auto.page ? '<a href="' + U.esc(auto.page) + '" target="_blank" rel="noopener">Photo</a>' : 'Photo') +
+          ' : ' + U.esc(auto.auteur) + ' · ' +
+          (auto.licenceUrl ? '<a href="' + U.esc(auto.licenceUrl) + '" target="_blank" rel="noopener">' + U.esc(auto.licence) + '</a>' : U.esc(auto.licence)) +
+          ' · Wikimedia Commons<br><button class="lien" data-photo-suivante>Pas la bonne photo ?</button></p>';
+      } else {
+        html = '<div class="fiche-emoji" aria-hidden="true">' + U.esc(r.emoji) + '</div>';
+      }
+      zone.innerHTML = html;
+      var suivante = zone.querySelector('[data-photo-suivante]');
+      if (suivante) suivante.addEventListener('click', function () {
+        suivante.disabled = true;
+        suivante.textContent = 'Recherche d\'une autre photo…';
+        PA.suivante(r).then(function (p) {
+          if (!document.contains(zone)) return;
+          rendreVisuel(p);
+          U.toast(p ? 'Nouvelle photo trouvée' : 'Aucune autre photo trouvée : l\'emoji est affiché');
+        });
+      });
+    }
+    var connue = !photo && !r.perso && PA.connue(id);
+    rendreVisuel(connue);
+    if (!photo && !connue && !r.perso && PA.actif()) {
+      PA.obtenir(r).then(function (p) { if (p && document.contains(app)) rendreVisuel(p); });
+    }
     var champ = $('#portions');
 
     function majPortions() {

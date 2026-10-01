@@ -61,6 +61,7 @@
   }
 
   construireNav();
+  window.PhotosAuto.initialiser();
   window.Minuteurs.initialiser(document.getElementById('minuteurs'));
   window.addEventListener('hashchange', route);
 

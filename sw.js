@@ -3,7 +3,9 @@
  * mise à jour en arrière-plan pour la visite suivante. */
 'use strict';
 
-var CACHE = 'ma-cuisine-v2';
+var CACHE = 'ma-cuisine-v3';
+var CACHE_PHOTOS = 'ma-cuisine-photos';
+var PHOTOS_MAX = 700;
 var FICHIERS = [
   './',
   'index.html',
@@ -28,7 +30,9 @@ var FICHIERS = [
   'js/recettes/monde-vege-pates.js',
   'js/recettes/monde-tartes-sandwichs-accomp-sauces.js',
   'js/recettes/monde-petitdej-desserts.js',
+  'js/photos-recettes.js',
   'js/donnees.js',
+  'js/photos-auto.js',
   'js/minuteurs.js',
   'js/vues/commun.js',
   'js/vues/liste.js',
@@ -47,13 +51,29 @@ self.addEventListener('install', function (e) {
 
 self.addEventListener('activate', function (e) {
   e.waitUntil(caches.keys().then(function (cles) {
-    return Promise.all(cles.filter(function (k) { return k !== CACHE; }).map(function (k) { return caches.delete(k); }));
+    return Promise.all(cles.filter(function (k) { return k !== CACHE && k !== CACHE_PHOTOS; }).map(function (k) { return caches.delete(k); }));
   }).then(function () { return self.clients.claim(); }));
 });
 
 self.addEventListener('fetch', function (e) {
   var req = e.request;
-  if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
+  if (req.method !== 'GET') return;
+  var url = new URL(req.url);
+  // Photos Wikimedia : cache d'abord (une photo ne change pas), pour le hors-ligne.
+  if (url.hostname === 'upload.wikimedia.org') {
+    e.respondWith(caches.open(CACHE_PHOTOS).then(function (cache) {
+      return cache.match(req).then(function (enCache) {
+        return enCache || fetch(req).then(function (rep) {
+          if (rep && rep.ok) {
+            cache.put(req, rep.clone()).then(function () { return limiter(cache); });
+          }
+          return rep;
+        });
+      });
+    }));
+    return;
+  }
+  if (url.origin !== location.origin) return;
   e.respondWith(caches.open(CACHE).then(function (cache) {
     return cache.match(req, { ignoreSearch: true }).then(function (enCache) {
       var reseau = fetch(req).then(function (rep) {
@@ -64,3 +84,11 @@ self.addEventListener('fetch', function (e) {
     });
   }));
 });
+
+/* Garde au plus PHOTOS_MAX photos (les plus anciennes partent d'abord). */
+function limiter(cache) {
+  return cache.keys().then(function (cles) {
+    var trop = cles.length - PHOTOS_MAX;
+    return trop > 0 ? Promise.all(cles.slice(0, trop).map(function (k) { return cache.delete(k); })) : null;
+  });
+}
