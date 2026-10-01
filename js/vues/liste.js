@@ -25,7 +25,7 @@
     var mots = U.normaliser(etat.recherche).split(/\s+/).filter(Boolean);
     var tri = TRIS[etat.tri] && (!TRIS[etat.tri].profil || D.cibles()) ? TRIS[etat.tri] : TRIS.nom;
     return D.recettes.filter(function (r) {
-      if (etat.cat === '♥' ? !D.estFavori(r.id) : etat.cat === '★' ? !r.perso : etat.cat === '🍱' ? !window.BATCH.CONSERVATION[r.id] : (etat.cat && r.cat !== etat.cat)) return false;
+      if (etat.cat === '♥' ? !D.estFavori(r.id) : etat.cat === '★' ? !r.perso : etat.cat === '🍱' ? !window.BATCH.CONSERVATION[r.id] : etat.cat === '🍲' ? !window.ONE_POT.RECETTES[r.id] : (etat.cat && r.cat !== etat.cat)) return false;
       if (etat.cuisine && r.cuisine !== etat.cuisine) return false;
       if (etat.temps && r.temps > Number(etat.temps)) return false;
       if (!D.regimeOk(r, etat.regime)) return false;
@@ -50,6 +50,7 @@
     D.recettes.forEach(function (r) { parCat[r.cat] = (parCat[r.cat] || 0) + 1; });
     var nbPerso = D.recettes.filter(function (r) { return r.perso; }).length;
     var nbBatch = D.recettes.filter(function (r) { return window.BATCH.CONSERVATION[r.id]; }).length;
+    var nbOnePot = D.recettes.filter(function (r) { return window.ONE_POT.RECETTES[r.id]; }).length;
 
     var tris = Object.keys(TRIS).filter(function (k) { return !TRIS[k].profil || D.cibles(); })
       .map(function (k) { return [k, TRIS[k].nom]; });
@@ -60,10 +61,15 @@
         '<div class="recherche"><input id="recherche" type="search" placeholder="Rechercher parmi ' + D.recettes.length + ' recettes, un ingrédient…" autocomplete="off" aria-label="Rechercher" value="' + U.esc(etat.recherche) + '"></div>' +
         '<a class="bouton bouton-principal bouton-creer" href="#/nouvelle">＋ <span>Créer une recette</span></a>' +
       '</div>' +
+      '<div class="themes">' +
+        '<a class="theme" href="#/onepot"><span aria-hidden="true">🍲</span><b>One pot</b><small>' + nbOnePot + ' recettes en une seule casserole</small></a>' +
+        '<a class="theme" href="#/batch"><span aria-hidden="true">🍱</span><b>Batch cooking</b><small>' + window.BATCH.SESSIONS.length + ' sessions pour la semaine</small></a>' +
+      '</div>' +
       '<nav class="puces" aria-label="Catégories">' +
         puce('', 'Tout', D.recettes.length) +
         puce('♥', '♥ Favoris', D.favoris.length) +
         (nbPerso ? puce('★', '⭐ Mes recettes', nbPerso) : '') +
+        puce('🍲', '🍲 One pot', nbOnePot) +
         puce('🍱', '🍱 Batch cooking', nbBatch) +
         window.CATEGORIES.map(function (c) { return puce(c.nom, c.emoji + ' ' + U.esc(c.nom), parCat[c.nom] || 0); }).join('') +
       '</nav>' +
@@ -122,7 +128,8 @@
   /* app est un conteneur neuf à chaque navigation : les écouteurs posés dessus ne s'accumulent pas. */
   window.Vues.liste = function (app, params, retour) {
     // #/recettes/batch : arrive directement sur les recettes qui se conservent.
-    if (params[0] === 'batch' && !(retour && etat.cat !== '🍱')) { etat.cat = '🍱'; if (!retour) etat.limite = PAGE; }
+    var pseudo = { batch: '🍱', onepot: '🍲' }[params[0]];
+    if (pseudo && !(retour && etat.cat !== pseudo)) { etat.cat = pseudo; if (!retour) etat.limite = PAGE; }
     rendre(app);
     window.scrollTo(0, retour ? defilement : 0);
     app.addEventListener('click', function (e) { if (e.target.closest('.carte')) defilement = window.scrollY; });
