@@ -184,15 +184,31 @@
     D.jour(iso)[repas].push({ id: id, portions: portions });
     D.sauverPlanning();
   };
+  /* Produit du commerce scanné, noté dans un repas : { produit: code, nom, marque, g, n100 }. */
+  D.planifierProduit = function (iso, repas, pr, grammes) {
+    D.jour(iso)[repas].push({ produit: pr.code, nom: pr.nom, marque: pr.marque, g: grammes,
+      n100: { kcal: pr.n100.kcal || 0, p: pr.n100.p || 0, g: pr.n100.g || 0, l: pr.n100.l || 0, f: pr.n100.f || 0 } });
+    D.sauverPlanning();
+  };
+
+  /* Valeurs d'une ligne du planning (recette ou produit), ou null si la recette n'existe plus. */
+  D.valeursEntree = function (e) {
+    var v = { kcal: 0, p: 0, g: 0, l: 0, f: 0 };
+    if (e.produit) { Object.keys(v).forEach(function (k) { v[k] = (e.n100[k] || 0) * e.g / 100; }); return v; }
+    var r = D.parId[e.id];
+    if (!r) return null;
+    Object.keys(v).forEach(function (k) { v[k] = r.nutrition.parPortion[k] * e.portions; });
+    return v;
+  };
+
   D.totauxJour = function (iso) {
     var t = { kcal: 0, p: 0, g: 0, l: 0, f: 0 };
     var j = D.planning[iso];
     if (!j) return t;
     D.REPAS.forEach(function (repas) {
       (j[repas.id] || []).forEach(function (e) {
-        var r = D.parId[e.id];
-        if (!r) return;
-        Object.keys(t).forEach(function (k) { t[k] += r.nutrition.parPortion[k] * e.portions; });
+        var v = D.valeursEntree(e);
+        if (v) Object.keys(t).forEach(function (k) { t[k] += v[k]; });
       });
     });
     return t;
@@ -361,7 +377,7 @@
     });
   };
   D.toutEffacer = function () {
-    Object.keys(DEFAUTS).concat(['minuteurs', 'photosAuto', 'reglages', 'batch']).forEach(function (cle) {
+    Object.keys(DEFAUTS).concat(['minuteurs', 'photosAuto', 'reglages', 'batch', 'produits']).forEach(function (cle) {
       try { localStorage.removeItem('cuisine.' + cle); } catch (e) { /* ignoré */ }
     });
     try { indexedDB.deleteDatabase('cuisine'); } catch (e) { /* ignoré */ }

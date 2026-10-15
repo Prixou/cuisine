@@ -1216,3 +1216,138 @@ details.chez-moi .articles li { display: flex; justify-content: space-between; g
 .badge-attention { background: color-mix(in srgb, var(--danger) 14%, transparent); color: var(--danger); }
 
 .mode-lactose { margin: 0 0 8px; font-size: .85rem; color: var(--texte-2); }
+
+/* ---------- Scanner et produits ---------- */
+.bouton-scan { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; background: var(--accent); color: var(--accent-texte); text-decoration: none; font-weight: 700; font-size: .9rem; flex: none; }
+
+.bouton-scan:hover { filter: brightness(1.08); }
+
+@media (max-width: 380px) { .bouton-scan-texte { display: none; } }
+
+.camera { position: relative; aspect-ratio: 4 / 3; max-height: 60vh; border-radius: 14px; overflow: hidden; background: #111; display: grid; place-items: center; }
+
+.camera video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
+
+.camera.active video { opacity: 1; }
+
+.camera-viseur { position: absolute; left: 12%; right: 12%; top: 30%; bottom: 30%; border: 3px solid rgba(255, 255, 255, .9); border-radius: 12px; box-shadow: 0 0 0 999px rgba(0, 0, 0, .35); display: none; }
+
+.camera.active .camera-viseur { display: block; }
+
+.camera-accueil { position: relative; padding: 16px; text-align: center; color: #fff; }
+
+.camera.active .camera-accueil { display: none; }
+
+.camera-actions { position: absolute; right: 10px; bottom: 10px; display: none; gap: 6px; }
+
+.camera.active .camera-actions { display: flex; }
+
+.scanner-saisie { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; margin-top: 10px; }
+
+.produits-liste { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 4px; }
+
+.produit-ligne { display: flex; align-items: center; gap: 12px; padding: 6px; border-radius: 12px; text-decoration: none; color: var(--texte); }
+
+.produit-ligne:hover { background: var(--surface-2); }
+
+.produit-vignette { flex: none; width: 52px; height: 52px; border-radius: 10px; background: #fff; display: grid; place-items: center; overflow: hidden; font-size: 1.6rem; border: 1px solid var(--bord); }
+
+.produit-vignette img { width: 100%; height: 100%; object-fit: contain; }
+
+.produit-texte { flex: 1; min-width: 0; }
+
+.produit-texte b { display: block; line-height: 1.3; overflow-wrap: anywhere; }
+
+.produit-texte small { color: var(--texte-2); font-size: .8rem; }
+
+.produit-score { flex: none; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+
+.produit-score small { color: var(--texte-2); font-size: .72rem; white-space: nowrap; }
+
+.score { display: inline-grid; place-items: center; min-width: 30px; height: 30px; padding: 0 6px; border-radius: 8px; font-weight: 800; color: #fff; font-size: .95rem; }
+
+.score-vide { background: var(--surface-2); color: var(--texte-2); font-weight: 600; font-size: .8rem; }
+
+.score-nutri-a, .score-eco-a { background: #038141; }
+.score-nutri-b, .score-eco-b { background: #85bb2f; }
+.score-nutri-c, .score-eco-c { background: #fecb02; color: #3a2e00; }
+.score-nutri-d, .score-eco-d { background: #ee8100; }
+.score-nutri-e, .score-eco-e { background: #e63e11; }
+.score-nova { font-size: .8rem; }
+.score-nova-1 { background: #00aa00; }
+.score-nova-2 { background: #ffcc00; color: #3a2e00; }
+.score-nova-3 { background: #ff6600; }
+.score-nova-4 { background: #ff0000; }
+
+.produit-entete { display: flex; gap: 18px; align-items: flex-start; margin-bottom: 12px; }
+
+.produit-image { flex: none; width: 140px; height: 140px; border-radius: 16px; background: #fff; border: 1px solid var(--bord); display: grid; place-items: center; overflow: hidden; font-size: 3rem; }
+
+.produit-image img { width: 100%; height: 100%; object-fit: contain; }
+
+.produit h1 { margin: 2px 0 4px; font-size: clamp(1.35rem, 5vw, 2rem); line-height: 1.15; }
+
+.produit-code { margin: 0 0 10px; color: var(--texte-2); font-size: .8rem; }
+
+.produit-scores { display: flex; flex-wrap: wrap; gap: 8px 14px; }
+
+.produit-scores > div { display: flex; align-items: center; gap: 8px; }
+
+.produit-scores small { font-size: .78rem; color: var(--texte-2); max-width: 9.5em; line-height: 1.25; }
+
+.produit-alerte { margin: 0 0 12px; padding: 9px 12px; border-radius: 10px; background: var(--surface-2); font-size: .9rem; }
+
+.produit-alerte.ok { background: var(--vege-doux); color: var(--vege); }
+
+.produit-alerte.danger { background: color-mix(in srgb, var(--danger) 14%, transparent); color: var(--danger); font-weight: 600; }
+
+.portion-produit { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-bottom: 10px; }
+
+.portion-produit label { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+
+.portion-produit .champ { width: 6em; }
+
+.portion-produit small { color: var(--texte-2); font-size: .8rem; }
+
+.tableau-nutri { width: 100%; border-collapse: collapse; font-size: .9rem; font-variant-numeric: tabular-nums; }
+
+.tableau-nutri th, .tableau-nutri td { padding: 6px 4px; border-bottom: 1px solid var(--bord); text-align: right; }
+
+.tableau-nutri th:first-child { text-align: left; font-weight: 600; }
+
+.tableau-nutri thead th { color: var(--texte-2); font-size: .78rem; }
+
+.tableau-nutri tr.sous th { font-weight: 400; padding-left: 16px; color: var(--texte-2); }
+
+.tableau-nutri td small { display: block; color: var(--texte-2); font-size: .72rem; }
+
+.niveau { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+
+.niveau-bas { background: #2f9e44; }
+.niveau-moyen { background: #f2a900; }
+.niveau-eleve { background: #e03131; }
+
+.produit-puces { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.puce-info { font-size: .8rem; padding: 3px 9px; border-radius: 999px; background: var(--surface-2); }
+
+.puce-info.danger { background: color-mix(in srgb, var(--danger) 14%, transparent); color: var(--danger); font-weight: 600; }
+
+.sous-titre { margin-top: 16px !important; }
+
+.produit-ingredients { margin-top: 12px; font-size: .88rem; }
+
+.produit-ingredients summary { cursor: pointer; font-weight: 600; }
+
+.repas-ajouts { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+
+.repas-ligne small { color: var(--texte-2); font-weight: 400; }
+
+@media (max-width: 600px) {
+  .produit-entete { gap: 12px; }
+  .produit-image { width: 96px; height: 96px; }
+}
+
+.historique-titre { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+
+.historique-titre h2 { margin: 0; }

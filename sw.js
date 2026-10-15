@@ -3,7 +3,7 @@
  * mise à jour en arrière-plan pour la visite suivante. */
 'use strict';
 
-var CACHE = 'ma-cuisine-v9';   // à changer avec App.VERSION (js/app.js) à chaque mise à jour
+var CACHE = 'ma-cuisine-v10';   // à changer avec App.VERSION (js/app.js) à chaque mise à jour
 var CACHE_PHOTOS = 'ma-cuisine-photos';
 var PHOTOS_MAX = 700;
 var FICHIERS = [
@@ -37,6 +37,8 @@ var FICHIERS = [
   'js/recettes/one-pot.js',
   'js/onepot.js',
   'js/lactose.js',
+  'js/produits.js',
+  'js/scanner.js',
   'js/donnees.js',
   'js/stock.js',
   'js/prix.js',
@@ -53,6 +55,8 @@ var FICHIERS = [
   'js/vues/editeur.js',
   'js/vues/batch.js',
   'js/vues/onepot.js',
+  'js/vues/scanner.js',
+  'js/lib/zxing.min.js',
   'js/app.js'
 ];
 

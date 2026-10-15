@@ -53,10 +53,18 @@
           (cibles ? '' : '<p class="aide"><a href="#/profil">🎯 Définissez vos objectifs</a> pour comparer chaque journée à vos besoins et générer des menus adaptés.</p>') +
           D.REPAS.map(function (repas) {
             var entrees = jour[repas.id];
-            var kcal = entrees.reduce(function (s, e) { var r = D.parId[e.id]; return s + (r ? r.nutrition.parPortion.kcal * e.portions : 0); }, 0);
+            var kcal = entrees.reduce(function (s, e) { var v = D.valeursEntree(e); return s + (v ? v.kcal : 0); }, 0);
             return '<div class="repas">' +
               '<div class="repas-titre"><h3>' + repas.emoji + ' ' + repas.nom + '</h3><span>' + (kcal ? U.r(kcal) + ' kcal' : '') + '</span></div>' +
               '<ul>' + entrees.map(function (e, i) {
+                if (e.produit) {
+                  return '<li class="repas-ligne"><a href="#/produit/' + encodeURIComponent(e.produit) + '">📦 ' + U.esc(e.nom) + (e.marque ? ' <small>' + U.esc(e.marque) + '</small>' : '') + '</a>' +
+                    '<div class="mini-portions"><button data-grammes="' + repas.id + ':' + i + ':-25" aria-label="Moins">−</button>' +
+                    '<span>' + U.r(e.g) + ' g</span>' +
+                    '<button data-grammes="' + repas.id + ':' + i + ':25" aria-label="Plus">+</button>' +
+                    '<span class="repas-kcal">' + U.r(D.valeursEntree(e).kcal) + ' kcal</span>' +
+                    '<button data-retirer="' + repas.id + ':' + i + '" aria-label="Retirer">✕</button></div></li>';
+                }
                 var r = D.parId[e.id];
                 if (!r) return '<li class="repas-ligne"><span>Recette supprimée</span><button data-retirer="' + repas.id + ':' + i + '" aria-label="Retirer">✕</button></li>';
                 return '<li class="repas-ligne"><a href="#/recette/' + encodeURIComponent(r.id) + '">' + U.esc(r.emoji) + ' ' + U.esc(r.nom) + '</a>' +
@@ -66,7 +74,8 @@
                   '<span class="repas-kcal">' + U.r(r.nutrition.parPortion.kcal * e.portions) + ' kcal</span>' +
                   '<button data-retirer="' + repas.id + ':' + i + '" aria-label="Retirer">✕</button></div></li>';
               }).join('') + '</ul>' +
-              '<button class="lien" data-ajouter="' + repas.id + '">＋ Ajouter</button></div>';
+              '<div class="repas-ajouts"><button class="lien" data-ajouter="' + repas.id + '">＋ Ajouter une recette</button>' +
+              '<a class="lien" href="#/scanner/' + iso + '/' + repas.id + '">📷 Scanner un produit</a></div></div>';
           }).join('') +
         '</section>' +
 
@@ -112,6 +121,15 @@
           var p = b.dataset.delta.split(':');
           var e = jour[p[0]][Number(p[1])];
           e.portions = Math.max(0.5, e.portions + Number(p[2]));
+          D.sauverPlanning();
+          rendre();
+        });
+      });
+      app.querySelectorAll('[data-grammes]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var p = b.dataset.grammes.split(':');
+          var e = jour[p[0]][Number(p[1])];
+          e.g = Math.max(5, e.g + Number(p[2]));
           D.sauverPlanning();
           rendre();
         });

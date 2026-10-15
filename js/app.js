@@ -3,7 +3,7 @@
   'use strict';
 
   var D = window.D, V = window.Vues;
-  var App = window.App = { installation: null, VERSION: 9 };   // à changer avec CACHE dans sw.js
+  var App = window.App = { installation: null, VERSION: 10 };   // à changer avec CACHE dans sw.js
 
   var NAV = [
     { route: '', emoji: '📖', nom: 'Recettes' },
@@ -19,6 +19,8 @@
     recettes: V.liste,
     batch: V.batch,
     onepot: V.onepot,
+    scanner: V.scanner,
+    produit: V.produit,
     recette: V.recette,
     courses: V.courses,
     planning: V.planning,
@@ -53,6 +55,8 @@
       if (a.dataset.route === section) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
     });
     if (V.recette.quitter) V.recette.quitter();
+    // La vue précédente libère ses ressources (caméra du scanner, requêtes en cours).
+    if (App.quitter) { App.quitter(); App.quitter = null; }
 
     // Conteneur neuf à chaque navigation : aucun écouteur ne survit d'une vue à l'autre.
     var ancien = document.getElementById('app');
