@@ -17,6 +17,7 @@ Application web de cuisine : **599 recettes** du monde entier, dont des recettes
 | 🥛 **Sans lactose** | Chaque recette qui contient du lactose a sa version sans lactose. Elle remplace le lait, la crème, les yaourts, le fromage blanc, les fromages frais et la mozzarella par leur équivalent sans lactose, et le beurre par de la margarine. Les fromages affinés (parmesan, comté, emmental, cheddar, camembert…) sont gardés, car ils sont naturellement presque sans lactose. Les produits transformés à vérifier sur l'étiquette sont signalés. La fiche détaille chaque remplacement et permet de passer d'une version à l'autre. Dans Objectifs, « Je suis intolérant(e) au lactose » applique les versions sans lactose partout : recettes, valeurs nutritionnelles, courses, prix et kits du stock. Le filtre « Sans lactose (ou adaptable) » est disponible dans la liste. |
 | ⚖️ **Portions** | Toutes les quantités sont recalculées et arrondies intelligemment (½, ¼, kg, L, cuillères, gousses, tranches…). |
 | 🔥 **Macros** | kcal, protéines, glucides, lipides, fibres par portion et au total, répartition des calories, part de vos besoins du jour. |
+| 📷 **Scanner de codes-barres** | Le bouton 📷 en haut de l'écran scanne un produit avec la caméra (lecteur intégré du téléphone, ou bibliothèque ZXing embarquée pour l'iPhone), ou retrouve-le par son code ou son nom. Les données viennent de la base libre **Open Food Facts** (plusieurs millions de produits) et la fiche affiche Nutri-Score, NOVA (degré de transformation), Green-Score, valeurs pour 100 g et pour votre portion avec la part de vos objectifs, repères faible / modéré / élevé, allergènes et alerte lactose, additifs, ingrédients et alternatives mieux notées. Un produit peut s'ajouter à un repas du planning (les totaux du jour en tiennent compte) ou devenir un ingrédient de vos recettes. L'historique des scans reste consultable hors ligne. |
 | 🛒 **Liste de courses** | Ajout d'une recette (ou de toute la semaine du planning) avec ses portions. Les ingrédients sont additionnés et rangés par rayon. Articles libres, cases à cocher, partage / copie. |
 | 💶 **Prix Lidl / E.Leclerc** | Prix de la liste de courses dans les deux magasins, avec le moins cher mis en avant. Le calcul compte des paquets entiers en caisse (une plaquette de 250 g, une boîte de 12 œufs) et les fruits, légumes et viandes au poids. Il donne aussi la part réellement utilisée par les recettes et ce qui est déjà dans le caddie. Chaque article affiche son prix et son conditionnement : touchez-le pour corriger le prix ou le paquet selon votre magasin. Le coût par portion apparaît sur chaque recette et chaque carte, avec un tri « moins chère par portion » et le coût des sessions de batch cooking. |
 | 📅 **Planning** | Repas de la semaine (petit-déjeuner, déjeuner, dîner, collation), totaux journaliers face aux objectifs, **génération automatique** des repas selon vos calories et macros. |
@@ -53,11 +54,14 @@ js/prix.js                  prix indicatifs Lidl et E.Leclerc par conditionnemen
 js/budget.js                coût des courses et des recettes
 js/onepot.js                one pot : ustensile et style (healthy / gourmand) de chaque recette
 js/lactose.js               sans lactose : remplacements, fromages affinés, ingrédients à vérifier
+js/produits.js              Open Food Facts : fiche produit, cache, historique, recherche, alternatives
+js/scanner.js               lecture des codes-barres (BarcodeDetector ou ZXing)
+js/lib/zxing.min.js         bibliothèque ZXing (Apache 2.0), chargée à la demande
 js/batch.js                 batch cooking : conservation, réchauffage, sessions
 js/donnees.js               données perso, objectifs, planning, courses, photos
 js/photos-auto.js           recherche des photos sur Wikimedia, cache, crédits
 js/minuteurs.js             minuteurs de cuisine
-js/vues/*.js                écrans (liste, fiche, batch, one pot, courses, planning, chez moi, objectifs, éditeur)
+js/vues/*.js                écrans (liste, fiche, batch, one pot, scanner et produit, courses, planning, chez moi, objectifs, éditeur)
 js/app.js                   navigation
 tools/valider.js            vérification des données (dont les doublons)
 tools/ajouter-fichier.py    déclare un nouveau fichier de recettes
